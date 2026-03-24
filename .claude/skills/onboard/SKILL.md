@@ -7,7 +7,7 @@ argument-hint: "[target]"
 
 ## MANDATORY PREPARATION
 
-Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: the "aha moment" you want users to reach, and users' experience level.
+Invoke /frontend-design — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run /teach-impeccable first. Additionally gather: the "aha moment" you want users to reach, and users' experience level.
 
 ---
 
