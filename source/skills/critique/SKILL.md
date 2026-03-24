@@ -1,16 +1,13 @@
 ---
 name: critique
-description: Evaluate design effectiveness from a UX perspective. Assesses visual hierarchy, information architecture, emotional resonance, cognitive load, and overall design quality with quantitative scoring, persona-based testing, and actionable feedback.
-args:
-  - name: area
-    description: The feature or area to critique (optional)
-    required: false
+description: "Evaluate design effectiveness from a UX perspective. Assesses visual hierarchy, information architecture, emotional resonance, cognitive load, and overall design quality with quantitative scoring, persona-based testing, and actionable feedback. Use when the user asks to review, critique, evaluate, or give feedback on a design, UI, or component."
+argument-hint: "[area (feature, page, component...)]"
 user-invocable: true
 ---
 
 ## MANDATORY PREPARATION
 
-Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: what the interface is trying to accomplish.
+Invoke {{command_prefix}}frontend-design — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run {{command_prefix}}teach-impeccable first. Additionally gather: what the interface is trying to accomplish.
 
 ---
 

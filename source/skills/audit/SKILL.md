@@ -1,16 +1,13 @@
 ---
 name: audit
-description: Perform comprehensive audit of interface quality across accessibility, performance, theming, and responsive design. Generates scored report with severity ratings and actionable plan.
-args:
-  - name: area
-    description: The feature or area to audit (optional)
-    required: false
+description: "Perform a comprehensive audit of interface quality across accessibility, performance, theming, and responsive design. Generates a scored report with severity ratings and actionable plan. Use when the user wants a design review, accessibility check, quality audit, or a full list of UI issues to fix."
+argument-hint: "[area (feature, page, component...)]"
 user-invocable: true
 ---
 
 Run systematic quality checks and generate a comprehensive audit report with quantitative scoring, prioritized issues, and an actionable plan. Don't fix issues — document them for other commands to address.
 
-**First**: Use the frontend-design skill for design principles and anti-patterns.
+**First**: Invoke {{command_prefix}}frontend-design for design principles and anti-patterns.
 
 ## Diagnostic Scan
 

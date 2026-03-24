@@ -1,16 +1,13 @@
 ---
 name: audit
-description: Perform comprehensive audit of interface quality across accessibility, performance, theming, and responsive design. Generates scored report with severity ratings and actionable plan.
+description: Perform a comprehensive audit of interface quality across accessibility, performance, theming, and responsive design. Generates a scored report with severity ratings and actionable plan. Use when the user wants a design review, accessibility check, quality audit, or a full list of UI issues to fix.
 user-invocable: true
-args:
-  - name: area
-    description: The feature or area to audit (optional)
-    required: false
+argument-hint: "[area (feature, page, component...)]"
 ---
 
 Run systematic quality checks and generate a comprehensive audit report with quantitative scoring, prioritized issues, and an actionable plan. Don't fix issues — document them for other commands to address.
 
-**First**: Use the frontend-design skill for design principles and anti-patterns.
+**First**: Invoke /frontend-design for design principles and anti-patterns.
 
 ## Diagnostic Scan
 
@@ -119,7 +116,7 @@ For each issue, document:
 - **Impact**: How it affects users
 - **WCAG/Standard**: Which standard it violates (if applicable)
 - **Recommendation**: How to fix it
-- **Suggested command**: Which command to use (prefer: /adapt, /animate, /audit, /bolder, /clarify, /colorize, /critique, /delight, /distill, /extract, /harden, /normalize, /onboard, /optimize, /polish, /quieter, /arrange, /overdrive, /typeset — or other installed skills you're sure exist)
+- **Suggested command**: Which command to use (prefer: /animate, /quieter, /optimize, /adapt, /clarify, /distill, /delight, /onboard, /normalize, /audit, /harden, /polish, /extract, /bolder, /arrange, /typeset, /critique, /colorize, /overdrive — or other installed skills you're sure exist)
 
 #### P0 — Blocking Issues
 [Issues that prevent task completion or violate WCAG A]
@@ -159,7 +156,7 @@ List recommended commands in priority order:
 ...
 
 **Rules for recommendations**:
-- Only recommend commands from: /adapt, /animate, /audit, /bolder, /clarify, /colorize, /critique, /delight, /distill, /extract, /harden, /normalize, /onboard, /optimize, /polish, /quieter, /arrange, /overdrive, /typeset
+- Only recommend commands from: /animate, /quieter, /optimize, /adapt, /clarify, /distill, /delight, /onboard, /normalize, /audit, /harden, /polish, /extract, /bolder, /arrange, /typeset, /critique, /colorize, /overdrive
 - Order by severity: P0 issues first, then P1, then P2 (skip P3 unless user has few issues)
 - Each item's description should carry enough context that the command knows what to focus on
 - Map findings to the most appropriate command

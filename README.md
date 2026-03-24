@@ -162,6 +162,21 @@ cp -r dist/gemini/.gemini your-project/
 cp -r dist/codex/.codex/* ~/.codex/
 ```
 
+**Trae:**
+```bash
+# Trae China (domestic version)
+cp -r dist/trae/.trae-cn/skills/* ~/.trae-cn/skills/
+
+# Trae International
+cp -r dist/trae/.trae/skills/* ~/.trae/skills/
+```
+
+> **Note:** Trae has two versions with different config directories:
+> - **Trae China**: `~/.trae-cn/skills/`
+> - **Trae International**: `~/.trae/skills/`
+>
+> After copying, restart Trae IDE to activate the skills.
+
 ## Usage
 
 Once installed, use commands in your AI harness:
@@ -192,6 +207,7 @@ Most commands accept an optional argument to focus on a specific area:
 - [Codex CLI](https://github.com/openai/codex)
 - [VS Code Copilot](https://code.visualstudio.com)
 - [Kiro](https://kiro.dev)
+- [Trae](https://trae.ai)
 
 ## Contributing
 
