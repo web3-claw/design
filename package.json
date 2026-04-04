@@ -11,7 +11,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@impeccable/detect": "^2.0.4"
+    "@impeccable/detect": "^2.0.5"
   },
   "description": "Detect UI anti-patterns and design quality issues from the command line",
   "keywords": [
