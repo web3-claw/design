@@ -18,9 +18,14 @@ import {
   DETECTION_LAYERS,
   VISUAL_EXAMPLES,
   LLM_ONLY_RULES,
+  GALLERY_ITEMS,
 } from '../../content/site/anti-patterns-catalog.js';
 
-export { LAYER_LABELS, LAYER_DESCRIPTIONS } from '../../content/site/anti-patterns-catalog.js';
+export {
+  LAYER_LABELS,
+  LAYER_DESCRIPTIONS,
+  GALLERY_ITEMS,
+} from '../../content/site/anti-patterns-catalog.js';
 
 /**
  * Skills that should be excluded from the index and not get a detail page.

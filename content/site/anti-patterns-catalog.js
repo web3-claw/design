@@ -165,8 +165,6 @@ export const VISUAL_EXAMPLES = {
   'mobile-amputation': `<div style="font-family: system-ui, sans-serif;"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid #e8e4df; border-radius: 6px; margin-bottom: 4px; font-size: 12px; color: #999; text-decoration: line-through;"><span>Export to CSV</span></div><div style="font-size: 10px; color: #888; margin-top: 4px;">"Not available on mobile."</div></div>`,
 };
 
-// ─── LLM-only rules ──────────────────────────────────────────────────
-
 /**
  * Anti-patterns that live in the /impeccable skill's DON'T list but
  * don't have a deterministic detector. These can only be caught by
@@ -176,6 +174,87 @@ export const VISUAL_EXAMPLES = {
  * description, skillSection. The generator merges these into the
  * grouped sections alongside detected rules with an 'llm' layer badge.
  */
+// ─── Gallery: real examples in the wild ──────────────────────────────
+
+/**
+ * Curated real-world examples of anti-patterns caught in the wild.
+ * Each entry maps to:
+ *   - public/antipattern-images/{id}.png  (preview thumbnail)
+ *   - public/antipattern-examples/{id}.html  (standalone live example)
+ * Rendered as a dedicated section on the /anti-patterns page, replacing
+ * the old /gallery route which was confusingly labeled in the top nav.
+ */
+export const GALLERY_ITEMS = [
+  {
+    id: 'purple-gradients',
+    title: 'Purple Gradients Everywhere',
+    desc:
+      'The AI color palette: purple-to-blue gradients on everything. Buttons, text, backgrounds, orbs. The new "make it pop."',
+  },
+  {
+    id: 'lazy-cool',
+    title: 'Lazy "Cool"',
+    desc:
+      'Glassmorphism, neon glows, blurred orbs, monospace everything. Looks like a hackathon project, not a product.',
+  },
+  {
+    id: 'lazy-impact',
+    title: 'Lazy "Impact"',
+    desc:
+      'When in doubt, animate everything. Bouncing buttons, wiggling icons, gradient text, floating badges. Motion without meaning.',
+  },
+  {
+    id: 'thick-border-cards',
+    title: 'Side-Tab Cards',
+    desc:
+      'A thick colored border on one side of a rounded card. The single most recognizable tell of AI-generated UI.',
+  },
+  {
+    id: 'cardocalypse',
+    title: 'Cardocalypse',
+    desc:
+      'Cards inside cards inside cards. Five levels of nesting, each with its own padding and shadow.',
+  },
+  {
+    id: 'layout-templates',
+    title: 'Copy-Paste Layouts',
+    desc:
+      'The same hero-metric-features template repeated with different colors. When every section looks the same, nothing stands out.',
+  },
+  {
+    id: 'inter-everywhere',
+    title: 'Inter Everywhere',
+    desc:
+      'One font for everything. Headings, body, labels, buttons. No typographic hierarchy, no personality, no design.',
+  },
+  {
+    id: 'massive-icons',
+    title: 'Massive Icons',
+    desc:
+      'Icon containers larger than the content they introduce. When the decoration is bigger than the message, priorities are backwards.',
+  },
+  {
+    id: 'bad-contrast',
+    title: 'Bad Contrast Choices',
+    desc:
+      'Gray text on colored backgrounds, low-contrast labels, unreadable combinations. Looking good and being readable should not conflict.',
+  },
+  {
+    id: 'redundant-ux-writing',
+    title: 'Redundant UX Writing',
+    desc:
+      'Label, sublabel, helper text, and hint text all saying the same thing in slightly different words. Say it once, say it well.',
+  },
+  {
+    id: 'modal-abuse',
+    title: 'Modal Abuse',
+    desc:
+      'Complex settings crammed into a modal. If it needs a scroll bar and three columns, it deserves its own page.',
+  },
+];
+
+// ─── LLM-only rules ──────────────────────────────────────────────────
+
 export const LLM_ONLY_RULES = [
   {
     id: 'syne-display-font',

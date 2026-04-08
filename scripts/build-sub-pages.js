@@ -19,6 +19,7 @@ import {
   CATEGORY_DESCRIPTIONS,
   LAYER_LABELS,
   LAYER_DESCRIPTIONS,
+  GALLERY_ITEMS,
 } from './lib/sub-pages-data.js';
 import { renderMarkdown, slugify } from './lib/render-markdown.js';
 import { renderPage } from './lib/render-page.js';
@@ -356,11 +357,16 @@ function renderAntiPatternsSidebar(grouped) {
 
   return `
 <aside class="skills-sidebar anti-patterns-sidebar" aria-label="Anti-pattern sections">
-  <div class="skills-sidebar-inner">
+  <button class="skills-sidebar-toggle" type="button" aria-expanded="false" aria-controls="anti-patterns-sidebar-inner">
+    <span class="skills-sidebar-toggle-label">Sections</span>
+    <svg class="skills-sidebar-toggle-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="skills-sidebar-inner" id="anti-patterns-sidebar-inner">
     <p class="skills-sidebar-label">Sections</p>
     <div class="skills-sidebar-group">
       <ul class="skills-sidebar-list anti-patterns-sidebar-list">
 ${entries}
+        <li><a href="#in-the-wild"><span>In the wild</span><span class="anti-patterns-sidebar-count">${GALLERY_ITEMS.length}</span></a></li>
       </ul>
     </div>
   </div>
@@ -381,17 +387,13 @@ function renderRuleCard(rule) {
   const visual = rule.visual
     ? `<div class="rule-card-visual" aria-hidden="true"><div class="rule-card-visual-inner">${rule.visual}</div></div>`
     : '';
-  const ruleIdDisplay = rule.layer === 'llm' ? '' : `<code class="rule-card-id">${escapeHtml(rule.id)}</code>`;
   return `
     <article class="rule-card" id="rule-${rule.id}" data-layer="${layer}">
       ${visual}
       <div class="rule-card-body">
         <div class="rule-card-head">
-          ${ruleIdDisplay}
-          <span class="rule-card-badges">
-            <span class="rule-card-category" data-category="${rule.category}">${categoryLabel}</span>
-            <span class="rule-card-layer" data-layer="${layer}" title="${escapeAttr(layerTitle)}">${escapeHtml(layerLabel)}</span>
-          </span>
+          <span class="rule-card-category" data-category="${rule.category}">${categoryLabel}</span>
+          <span class="rule-card-layer" data-layer="${layer}" title="${escapeAttr(layerTitle)}">${escapeHtml(layerLabel)}</span>
         </div>
         <h3 class="rule-card-name">${escapeHtml(rule.name)}</h3>
         <p class="rule-card-desc">${escapeHtml(rule.description)}</p>
@@ -481,6 +483,19 @@ ${rules.map(renderRuleCard).join('\n')}
     .filter((r) => r.layer !== 'llm').length;
   const llmCount = totalRules - detectedCount;
 
+  const galleryHtml = GALLERY_ITEMS.map(
+    (item) => `
+      <a class="gallery-card" href="/antipattern-examples/${item.id}.html">
+        <div class="gallery-card-thumb">
+          <img src="/antipattern-images/${item.id}.png" alt="${escapeAttr(item.title)} example" loading="lazy" width="540" height="540">
+        </div>
+        <div class="gallery-card-body">
+          <h3 class="gallery-card-title">${escapeHtml(item.title)}</h3>
+          <p class="gallery-card-desc">${escapeHtml(item.desc)}</p>
+        </div>
+      </a>`,
+  ).join('\n');
+
   return `
 <div class="anti-patterns-content">
   <header class="anti-patterns-header">
@@ -507,6 +522,17 @@ ${rules.map(renderRuleCard).join('\n')}
   <div class="anti-patterns-sections">
 ${sectionsHtml}
   </div>
+
+  <section class="gallery-section" id="in-the-wild">
+    <header class="anti-patterns-section-header">
+      <h2 class="anti-patterns-section-title">In the wild</h2>
+      <p class="anti-patterns-section-count">${GALLERY_ITEMS.length} specimens</p>
+    </header>
+    <p class="gallery-section-lede">Real examples scraped from the web. Click any to see the live page with the overlay running.</p>
+    <div class="gallery-grid">
+${galleryHtml}
+    </div>
+  </section>
 </div>`;
 }
 
