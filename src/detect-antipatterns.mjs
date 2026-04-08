@@ -95,7 +95,7 @@ const ANTIPATTERNS = [
     description:
       'Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.',
     skillSection: 'Visual Details',
-    skillGuideline: 'thick colored border on one side',
+    skillGuideline: 'colored accent stripe',
   },
   {
     id: 'border-accent-on-rounded',
@@ -104,7 +104,7 @@ const ANTIPATTERNS = [
     description:
       'Thick accent border on a rounded card — the border clashes with the rounded corners. Remove the border or the border-radius.',
     skillSection: 'Visual Details',
-    skillGuideline: 'thick colored border on one side',
+    skillGuideline: 'colored accent stripe',
   },
   {
     id: 'overused-font',
