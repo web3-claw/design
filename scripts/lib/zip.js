@@ -58,5 +58,4 @@ export async function createAllZips(distDir) {
   console.log('\n📦 Creating ZIP bundles...');
 
   await createProviderZip(path.join(distDir, 'universal'), distDir, 'universal');
-  await createProviderZip(path.join(distDir, 'universal-prefixed'), distDir, 'universal-prefixed');
 }

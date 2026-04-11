@@ -117,7 +117,7 @@
             </div>
           </div>
         </div>
-        <p class="hero-version-link"><a href="#changelog">v2.2: 1 skill, 20 commands</a></p>
+        <p class="hero-version-link"><a href="#changelog">v3.0: 1 skill, 20 commands</a></p>
       </div>
 
       <!-- Right: Before/After Demo -->
@@ -329,10 +329,10 @@
 
       <!-- Row 1: Primary install + How to use (50/50 split) -->
       <div class="install-row-primary" data-reveal>
-        <!-- Left: Install the skill -->
+        <!-- Left: Install the skill and CLI -->
         <div class="install-primary-main">
-          <h3 class="install-path-title"><span class="install-path-step">1</span>Install the skill <span class="install-path-badge">Recommended</span></h3>
-          <p class="install-path-desc">One agent skill that teaches your AI to design, with 20 commands bundled inside.</p>
+          <h3 class="install-path-title"><span class="install-path-step">1</span>Install the skill and CLI</h3>
+          <p class="install-path-desc">One agent skill that teaches your AI to design, with 20 commands bundled inside. Plus the CLI that powers visual mode and scans files outside the skill.</p>
 
           <div class="install-path-terminal">
             <div class="glass-terminal">
@@ -355,51 +355,54 @@
                   </div>
                   <span class="install-terminal-note">Works with Cursor, Claude Code, Gemini CLI, Codex CLI, and more.</span>
                 </div>
+                <div class="install-terminal-row">
+                  <div class="install-terminal-cmd">
+                    <span class="terminal-prompt">$</span>
+                    <code>npm i -g impeccable</code>
+                    <button class="copy-btn" aria-label="Copy command" data-copy="npm i -g impeccable">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <span class="install-terminal-note">Recommended for visual mode and anti-pattern scans.</span>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Other install methods, collapsed by default -->
-          <details class="install-alts-collapse">
+          <details class="install-primary-alts">
             <summary class="install-alts-summary">
-              <span class="install-alts-summary-label">Other install methods</span>
-              <svg class="install-alts-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <span class="install-alts-label">Other install methods</span>
+              <svg class="install-alts-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
             </summary>
-            <div class="install-primary-alts">
-              <div class="install-alt-method">
-                <span class="install-alt-label">Claude Code plugin</span>
-                <div class="install-terminal-cmd">
-                  <span class="terminal-prompt">$</span>
-                  <code>/plugin marketplace add pbakaus/impeccable</code>
-                  <button class="copy-btn" aria-label="Copy command" data-copy="/plugin marketplace add pbakaus/impeccable">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-                    </svg>
-                  </button>
-                </div>
-                <span class="install-alt-note">Then open <code>/plugin</code> in Claude Code</span>
-              </div>
 
-              <div class="install-alt-method">
-                <span class="install-alt-label">Manual download <span class="install-alt-sublabel">all 11 providers</span></span>
-                <div class="install-zip-links">
-                  <button class="install-zip-link" data-bundle="universal" aria-label="Download universal zip with default skill name">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
-                    <span class="install-zip-link-name">Default zip</span>
-                    <span class="install-zip-link-examples"><code>/impeccable polish</code> <code>/impeccable audit</code></span>
-                  </button>
-                  <button class="install-zip-link" data-bundle="universal-prefixed" aria-label="Download universal zip with prefixed skill name">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
-                    <span class="install-zip-link-name">Prefixed zip</span>
-                    <span class="install-zip-link-examples"><code>/i-impeccable polish</code> <code>/i-impeccable audit</code></span>
-                  </button>
-                </div>
+            <div class="install-alt-method">
+              <span class="install-alt-label">Claude Code plugin</span>
+              <div class="install-terminal-cmd">
+                <span class="terminal-prompt">$</span>
+                <code>/plugin marketplace add pbakaus/impeccable</code>
+                <button class="copy-btn" aria-label="Copy command" data-copy="/plugin marketplace add pbakaus/impeccable">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                  </svg>
+                </button>
               </div>
+              <span class="install-alt-note">Then open <code>/plugin</code> in Claude Code</span>
+            </div>
+
+            <div class="install-alt-method">
+              <span class="install-alt-label">Manual download <span class="install-alt-sublabel">all 11 providers</span></span>
+              <button class="install-zip-link" data-bundle="universal" aria-label="Download universal zip">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                <span class="install-zip-link-name">Download universal zip</span>
+                <span class="install-zip-link-examples"><code>/impeccable polish</code> <code>/impeccable audit</code></span>
+              </button>
             </div>
           </details>
         </div>
@@ -433,40 +436,23 @@
 
       <!-- Steps 3-4: vertical accordion, mutually exclusive (only one open at a time) -->
       <div class="install-accordion" data-reveal>
-        <!-- Step 3: Anti-pattern tools (CLI + Browser extension) -->
+        <!-- Step 3: Chrome extension -->
         <details name="install-steps" class="install-step">
           <summary class="install-step-summary">
-            <h3 class="install-path-title"><span class="install-path-step">3</span>Add the anti-pattern tools <span class="install-path-badge install-path-badge-muted">Optional</span></h3>
+            <h3 class="install-path-title"><span class="install-path-step">3</span>Add the Chrome extension <span class="install-path-badge install-path-badge-muted">Optional</span></h3>
             <svg class="install-step-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
           </summary>
           <div class="install-step-body">
-            <p class="install-path-desc">Two ways to catch AI slop outside the skill: a CLI for the terminal and a Chrome extension for any webpage. Both catch gradient text, AI color palettes, nested cards, low contrast, and 20+ more rules.</p>
+            <p class="install-path-desc">Click the toolbar icon on any page and every anti-pattern lights up right where it lives. Catches gradient text, AI color palettes, nested cards, low contrast, and 20+ more rules. Works on localhost, staging, production, or anyone else's site.</p>
 
-            <div class="install-tool-grid">
-              <div class="install-tool">
-                <div class="install-tool-label">CLI <span class="install-path-badge install-path-badge-muted">Beta</span></div>
-                <p class="install-tool-desc">Scan files, directories, or live URLs from the terminal. Drop into CI pipelines, pre-commit hooks, or one-off audits.</p>
-                <div class="install-cmd-block">
-                  <div class="install-cmd-line">
-                    <span class="terminal-prompt">$</span>
-                    <code>npm i -g impeccable</code>
-                    <button class="copy-btn" aria-label="Copy command" data-copy="npm i -g impeccable">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <span class="install-cmd-note">Or use <code>npx impeccable detect src/</code> without installing.</span>
-                </div>
-                <p class="install-path-link"><a href="https://www.npmjs.com/package/impeccable" target="_blank" rel="noopener">Full command reference on npm &rarr;</a></p>
-              </div>
-
-              <div class="install-tool">
-                <div class="install-tool-label">Chrome extension</div>
-                <p class="install-tool-desc">Click the toolbar icon on any page and every anti-pattern lights up right where it lives. Works on localhost, staging, production, or anyone else's site.</p>
-                <p class="install-path-link"><a href="https://chromewebstore.google.com/detail/impeccable/bdkgmiklpdmaojlpflclinlofgjfpabf" target="_blank" rel="noopener">Install from Chrome Web Store &rarr;</a></p>
-              </div>
+            <div class="install-tool install-tool--solo">
+              <a href="https://chromewebstore.google.com/detail/impeccable/bdkgmiklpdmaojlpflclinlofgjfpabf" target="_blank" rel="noopener" class="install-tool-preview" aria-label="Install Impeccable from the Chrome Web Store">
+                <img src="assets/extension-detection.png" alt="Screenshot of the Impeccable Chrome extension highlighting anti-patterns on a webpage" width="600" height="508" loading="lazy">
+                <span class="install-tool-preview-caption">Live detection on any webpage</span>
+              </a>
+              <a href="https://chromewebstore.google.com/detail/impeccable/bdkgmiklpdmaojlpflclinlofgjfpabf" target="_blank" rel="noopener" class="btn btn-primary install-tool-cta">
+                <span>Install from Chrome Web Store &rarr;</span>
+              </a>
             </div>
           </div>
         </details>
@@ -519,36 +505,49 @@
       <div class="changelog-list" data-reveal>
         <div class="changelog-entry">
           <div class="changelog-version-header">
-            <span class="changelog-version">v2.1</span>
-            <span class="changelog-date">April 9, 2026</span>
+            <span class="changelog-version">v3.0</span>
+            <span class="changelog-date">April 10, 2026</span>
           </div>
           <ul class="changelog-items">
-            <li><strong>Streamlined from 21 to 18 commands.</strong> Removed overlap and confusion: <code>/arrange</code> renamed to <code>/layout</code>, <code>/normalize</code> merged into <code>/polish</code> (design system alignment is now part of the final pass), <code>/onboard</code> merged into <code>/harden</code> (empty states and first-run experiences are part of production readiness), and <code>/extract</code> became <code>/impeccable extract</code> (a sub-mode alongside craft and teach). Every remaining command has a clearly distinct job.</li>
-            <li><strong>Automatic cleanup of deprecated skills.</strong> On first load after updating, the skill detects and removes leftover files from renamed or merged commands. No manual cleanup needed.</li>
-          </ul>
-        </div>
-
-        <div class="changelog-entry">
-          <div class="changelog-version-header">
-            <span class="changelog-version">v2.0</span>
-            <span class="changelog-date">April 8, 2026</span>
-          </div>
-          <ul class="changelog-items">
-            <li><strong>Renamed <code>frontend-design</code> to <code>impeccable</code>.</strong> The core skill now shares its name with the project, and the teach subcommand moved from <code>/teach-impeccable</code> to <code>/impeccable teach</code>. One skill, one namespace.</li>
-            <li><strong>Data-driven skill rewrite.</strong> The core skill was rebuilt against an internal eval framework that runs the same brief through frontier models with and without the skill loaded, then measures how much the output collapses into monoculture. The result: dramatically more font and color diversity, sharper overall design quality, and much stronger Codex support. The biggest unlock was an anti-attractor procedure that forces the model to enumerate and reject its reflex defaults before picking. Validated on gpt-5.4 and Qwen 3.6 Plus across 15 niches.</li>
-            <li><strong>Anti-pattern detection engine.</strong> 25 deterministic rules across typography, color, layout, motion, and quality. Handles oklch, oklab, lch, and lab color formats, CSS variables inside border shorthands, gradient-backed text, and emoji-only nodes.</li>
-            <li><strong>CLI: <code>npx impeccable detect</code>.</strong> Scans HTML, CSS, JSX/TSX, Vue, Svelte, and CSS-in-JS. Framework detection, multi-file import tracking, Puppeteer-backed live URL scanning, CI-ready JSON output, and a <code>--fast</code> regex mode for huge codebases.</li>
-            <li><strong>Chrome DevTools extension.</strong> One-click detection on any page: yours, staging, production, or someone else's. Reads live computed styles, surfaces findings in an interactive panel, and highlights elements on the page. In Chrome Web Store review.</li>
-            <li><strong><code>/critique</code> got teeth.</strong> Persona sub-agents review in parallel, score against Nielsen's heuristics, run the detector automatically, and open a live browser overlay so you can walk each finding in place.</li>
-            <li><strong>New ways to create with Impeccable.</strong> <code>/shape</code> runs a structured discovery interview about purpose, audience, and goals, then produces a design brief before any code is written. <code>/impeccable craft</code> chains that brief straight into the full implementation flow so you ship a designed feature instead of a reflex card grid.</li>
-            <li><strong>New docs site.</strong> Top-level <a href="/docs">Docs</a>, <a href="/anti-patterns">Anti-Patterns</a>, and <a href="/visual-mode">Visual Mode</a> sections. 18 per-skill pages with before/after demos and the canonical SKILL.md inline, two <a href="/tutorials">tutorials</a>, and 38 rule cards with inline visual examples.</li>
-            <li><strong>New harness: Rovo Dev.</strong> 11 supported AI tools total.</li>
+            <li><strong>18 skills became 1 skill with 20 commands.</strong> Every command now lives under <code>/impeccable</code>: <code>/impeccable audit</code>, <code>/impeccable polish</code>, <code>/impeccable critique</code>, and the rest. One entry in your <code>/</code> menu instead of 18, a shared design vocabulary between you and your AI, and far less namespace pollution as the plugin ecosystem grows. The autocomplete shows the full list the moment you type <code>/impeccable</code>.</li>
+            <li><strong>Pin your favorites back as shortcuts.</strong> Run <code>/impeccable pin audit</code> and <code>/audit</code> becomes a standalone command again, without reversing the consolidation. Under the hood it writes a lightweight redirect skill that delegates to <code>/impeccable audit</code>, so updates to the parent skill flow through automatically. <code>/impeccable unpin audit</code> removes it.</li>
+            <li><strong>Rewritten docs site.</strong> New <a href="/docs">/docs</a> home with a featured home command card, dense cheatsheet-style command rows by category, and per-command detail pages. The standalone <code>/cheatsheet</code> was merged into <code>/docs</code>. URL renamed from <code>/skills</code> to <code>/docs</code> with permanent redirects so existing links keep working. The homepage install section was rebuilt 50/50 with a proper "how to use" panel explaining the mixture-of-experts model in plain language.</li>
+            <li><strong>Teach runs automatically on first use.</strong> You no longer have to run <code>/impeccable teach</code> before anything else. Invoke any command in a fresh project and the Context Gathering Protocol kicks off the discovery interview mid-flight, then saves <code>.impeccable.md</code> so every future command reads it silently.</li>
           </ul>
         </div>
 
         <details class="changelog-older">
           <summary class="changelog-older-toggle">View older releases</summary>
           <div class="changelog-older-entries">
+            <div class="changelog-entry">
+              <div class="changelog-version-header">
+                <span class="changelog-version">v2.1</span>
+                <span class="changelog-date">April 9, 2026</span>
+              </div>
+              <ul class="changelog-items">
+                <li><strong>Streamlined from 21 to 18 commands.</strong> Removed overlap and confusion: <code>/arrange</code> renamed to <code>/layout</code>, <code>/normalize</code> merged into <code>/polish</code> (design system alignment is now part of the final pass), <code>/onboard</code> merged into <code>/harden</code> (empty states and first-run experiences are part of production readiness), and <code>/extract</code> became <code>/impeccable extract</code> (a sub-mode alongside craft and teach). Every remaining command has a clearly distinct job.</li>
+                <li><strong>Automatic cleanup of deprecated skills.</strong> On first load after updating, the skill detects and removes leftover files from renamed or merged commands. No manual cleanup needed.</li>
+              </ul>
+            </div>
+
+            <div class="changelog-entry">
+              <div class="changelog-version-header">
+                <span class="changelog-version">v2.0</span>
+                <span class="changelog-date">April 8, 2026</span>
+              </div>
+              <ul class="changelog-items">
+                <li><strong>Renamed <code>frontend-design</code> to <code>impeccable</code>.</strong> The core skill now shares its name with the project, and the teach subcommand moved from <code>/teach-impeccable</code> to <code>/impeccable teach</code>. One skill, one namespace.</li>
+                <li><strong>Data-driven skill rewrite.</strong> The core skill was rebuilt against an internal eval framework that runs the same brief through frontier models with and without the skill loaded, then measures how much the output collapses into monoculture. The result: dramatically more font and color diversity, sharper overall design quality, and much stronger Codex support. The biggest unlock was an anti-attractor procedure that forces the model to enumerate and reject its reflex defaults before picking. Validated on gpt-5.4 and Qwen 3.6 Plus across 15 niches.</li>
+                <li><strong>Anti-pattern detection engine.</strong> 25 deterministic rules across typography, color, layout, motion, and quality. Handles oklch, oklab, lch, and lab color formats, CSS variables inside border shorthands, gradient-backed text, and emoji-only nodes.</li>
+                <li><strong>CLI: <code>npx impeccable detect</code>.</strong> Scans HTML, CSS, JSX/TSX, Vue, Svelte, and CSS-in-JS. Framework detection, multi-file import tracking, Puppeteer-backed live URL scanning, CI-ready JSON output, and a <code>--fast</code> regex mode for huge codebases.</li>
+                <li><strong>Chrome DevTools extension.</strong> One-click detection on any page: yours, staging, production, or someone else's. Reads live computed styles, surfaces findings in an interactive panel, and highlights elements on the page. In Chrome Web Store review.</li>
+                <li><strong><code>/critique</code> got teeth.</strong> Persona sub-agents review in parallel, score against Nielsen's heuristics, run the detector automatically, and open a live browser overlay so you can walk each finding in place.</li>
+                <li><strong>New ways to create with Impeccable.</strong> <code>/shape</code> runs a structured discovery interview about purpose, audience, and goals, then produces a design brief before any code is written. <code>/impeccable craft</code> chains that brief straight into the full implementation flow so you ship a designed feature instead of a reflex card grid.</li>
+                <li><strong>New docs site.</strong> Top-level <a href="/docs">Docs</a>, <a href="/anti-patterns">Anti-Patterns</a>, and <a href="/visual-mode">Visual Mode</a> sections. 18 per-skill pages with before/after demos and the canonical SKILL.md inline, two <a href="/tutorials">tutorials</a>, and 38 rule cards with inline visual examples.</li>
+                <li><strong>New harness: Rovo Dev.</strong> 11 supported AI tools total.</li>
+              </ul>
+            </div>
+
             <div class="changelog-entry">
               <div class="changelog-version-header">
                 <span class="changelog-version">v1.6.0</span>

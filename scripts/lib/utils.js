@@ -380,50 +380,14 @@ export const PROVIDER_PLACEHOLDERS = {
 /**
  * Replace all {{placeholder}} tokens with provider-specific values
  */
-/**
- * Prefix skill cross-references in body text.
- * Replaces patterns like `/skillname` and `the skillname skill` with prefixed versions.
- *
- * @param {string} content - The skill body text
- * @param {string} prefix - The prefix to add (e.g., 'i-')
- * @param {string[]} skillNames - Array of all skill names
- * @param {string} commandPrefix - The command invocation prefix (e.g., '/' or '$')
- */
-export function prefixSkillReferences(content, prefix, skillNames, commandPrefix = '/') {
-  if (!prefix || !skillNames || skillNames.length === 0) return content;
-
-  let result = content;
-  // Sort by length descending to avoid partial matches (e.g. 'teach-impeccable' before 'teach')
-  const sorted = [...skillNames].sort((a, b) => b.length - a.length);
-
-  for (const name of sorted) {
-    const prefixed = `${prefix}${name}`;
-
-    // Replace command invocations (e.g., `/skillname` or `$skillname`) with prefixed versions
-    const escapedPrefix = escapeRegex(commandPrefix);
-    result = result.replace(
-      new RegExp(`${escapedPrefix}(?=${escapeRegex(name)}(?:[^a-zA-Z0-9_-]|$))`, 'g'),
-      `${commandPrefix}${prefix}`
-    );
-
-    // Replace `the skillname skill` references
-    result = result.replace(
-      new RegExp(`(the) ${escapeRegex(name)} skill`, 'gi'),
-      (_, article) => `${article} ${prefixed} skill`
-    );
-  }
-
-  return result;
-}
-
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 const EXCLUDED_FROM_SUGGESTIONS = new Set([
-  'impeccable', 'i-impeccable',               // foundational skill, not a steering command
-  'teach-impeccable', 'i-teach-impeccable',    // deprecated shim
-  'frontend-design', 'i-frontend-design',      // deprecated shim
+  'impeccable',               // foundational skill, not a steering command
+  'teach-impeccable',         // deprecated shim
+  'frontend-design',          // deprecated shim
 ]);
 
 // Sub-commands of /impeccable that should appear in {{available_commands}}.

@@ -170,8 +170,8 @@ function renderPatternsWithTabs(patterns, antipatterns) {
 // ============================================
 
 // Handle bundle download clicks via event delegation.
-// Each download button carries the full bundle name in data-bundle (e.g.
-// "universal" or "universal-prefixed") so the handler is just a redirect.
+// Each download button carries the full bundle name in data-bundle
+// (currently just "universal") so the handler is just a redirect.
 document.addEventListener("click", (e) => {
 	const bundleBtn = e.target.closest("[data-bundle]");
 	if (bundleBtn) {

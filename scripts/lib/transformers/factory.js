@@ -1,5 +1,5 @@
 import path from 'path';
-import { cleanDir, ensureDir, writeFile, generateYamlFrontmatter, replacePlaceholders, prefixSkillReferences, PROVIDER_PLACEHOLDERS } from '../utils.js';
+import { cleanDir, ensureDir, writeFile, generateYamlFrontmatter, replacePlaceholders } from '../utils.js';
 
 /**
  * Map from frontmatter field name to extraction spec.
@@ -54,8 +54,8 @@ export function createTransformer(config) {
     .filter(Boolean);
 
   return function transform(skills, distDir, options = {}) {
-    const { prefix = '', outputSuffix = '', skillsVersion = '' } = options;
-    const providerDir = path.join(distDir, `${provider}${outputSuffix}`);
+    const { skillsVersion = '' } = options;
+    const providerDir = path.join(distDir, provider);
     const skillsDir = path.join(providerDir, `${configDir}/skills`);
 
     cleanDir(providerDir);
@@ -64,13 +64,13 @@ export function createTransformer(config) {
     const allSkillNames = skills.map((s) => s.name);
     const commandNames = skills
       .filter((s) => s.userInvocable)
-      .map((s) => `${prefix}${s.name}`);
+      .map((s) => s.name);
 
     let refCount = 0;
     let scriptCount = 0;
 
     for (const skill of skills) {
-      const skillName = `${prefix}${skill.name}`;
+      const skillName = skill.name;
       const skillDir = path.join(skillsDir, skillName);
 
       // Build frontmatter
@@ -89,13 +89,11 @@ export function createTransformer(config) {
       const frontmatter = generateYamlFrontmatter(frontmatterObj);
 
       // Build body
-      const cmdPrefix = (PROVIDER_PLACEHOLDERS[placeholderKey] || {}).command_prefix || '/';
       let skillBody = replacePlaceholders(skill.body, placeholderKey, commandNames, allSkillNames);
 
       // Replace {{scripts_path}} with provider-aware path to skill's scripts directory
       const scriptsPath = `${configDir}/skills/${skillName}/scripts`;
       skillBody = skillBody.replace(/\{\{scripts_path\}\}/g, scriptsPath);
-      if (prefix) skillBody = prefixSkillReferences(skillBody, prefix, allSkillNames, cmdPrefix);
       if (bodyTransform) skillBody = bodyTransform(skillBody, skill);
 
       const content = `${frontmatter}\n\n${skillBody}`;
@@ -126,7 +124,6 @@ export function createTransformer(config) {
     const skillWord = skills.length === 1 ? 'skill' : 'skills';
     const refInfo = refCount > 0 ? ` (${refCount} reference files)` : '';
     const scriptInfo = scriptCount > 0 ? ` (${scriptCount} script files)` : '';
-    const prefixInfo = prefix ? ` [${prefix}prefixed]` : '';
-    console.log(`✓ ${displayName}${prefixInfo}: ${skills.length} ${skillWord}${refInfo}${scriptInfo}`);
+    console.log(`✓ ${displayName}: ${skills.length} ${skillWord}${refInfo}${scriptInfo}`);
   };
 }

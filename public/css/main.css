@@ -2785,59 +2785,46 @@ code {
 }
 
 .install-primary-alts {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
   min-width: 0;
 }
 
-/* Collapsible "other install methods" under the main install card. */
-.install-alts-collapse {
-  margin-top: var(--spacing-md);
-  border-top: 1px solid var(--color-mist);
+/* "Other install methods" is a collapsed <details> panel that sits
+   directly under the main install card. The alternatives are worth
+   keeping discoverable but don't need to be visible by default. */
+.install-primary-main > .install-primary-alts {
+  margin-top: var(--spacing-lg);
   padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-mist);
 }
 
-.install-alts-collapse[open] {
-  padding-bottom: var(--spacing-sm);
+.install-primary-alts[open] > .install-alts-summary > .install-alts-arrow {
+  transform: rotate(90deg);
 }
 
 .install-alts-summary {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-  cursor: pointer;
+  gap: var(--spacing-xs);
   list-style: none;
-  padding: 0.25rem 0;
-  user-select: none;
+  cursor: pointer;
+  padding: 2px 0;
 }
 
 .install-alts-summary::-webkit-details-marker {
   display: none;
 }
 
-.install-alts-summary-label {
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.install-alts-arrow {
   color: var(--color-ash);
+  transition: transform var(--duration-fast) var(--ease-out, ease);
 }
 
-.install-alts-chevron {
-  color: var(--color-ash);
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
+.install-primary-alts[open] > .install-alts-summary {
+  margin-bottom: var(--spacing-md);
 }
 
-.install-alts-collapse[open] .install-alts-chevron {
-  transform: rotate(180deg);
-}
-
-.install-alts-collapse[open] .install-primary-alts {
-  margin-top: var(--spacing-md);
+.install-primary-alts[open] > .install-alt-method + .install-alt-method {
+  margin-top: var(--spacing-lg);
 }
 
 /* Editorial "How to use" step list on the right side of the install row.
@@ -2956,6 +2943,42 @@ code {
   min-width: 0;
 }
 
+/* Solo install-tool (no grid wrapper) — used when step 3 is Chrome-only.
+   The preview screenshot sits to the left of the CTA button so neither
+   dominates vertical space. Collapses to a stack on narrow screens. */
+.install-tool--solo {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  width: 100%;
+}
+
+.install-tool--solo .install-tool-preview {
+  flex: 0 1 260px;
+  min-width: 0;
+  margin-top: 0;
+}
+
+.install-tool--solo .install-tool-cta {
+  flex: 1 1 auto;
+  margin-top: 0;
+  width: auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .install-tool--solo {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .install-tool--solo .install-tool-preview,
+  .install-tool--solo .install-tool-cta {
+    flex: 1 1 auto;
+  }
+}
+
 .install-tool-label {
   font-family: var(--font-body);
   font-size: 0.9375rem;
@@ -2969,8 +2992,48 @@ code {
 .install-tool-desc {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--color-charcoal);
+  color: var(--color-ink);
   line-height: 1.55;
+}
+
+/* Chrome extension screenshot preview inside the install-tool column */
+.install-tool-preview {
+  display: block;
+  margin-top: var(--spacing-sm);
+  border: 1px solid var(--color-mist);
+  border-radius: 8px;
+  overflow: hidden;
+  text-decoration: none;
+  background: var(--color-paper);
+  transition: border-color var(--duration-fast) var(--ease-out, ease),
+              transform var(--duration-fast) var(--ease-out, ease);
+}
+
+.install-tool-preview:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.install-tool-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.install-tool-preview-caption {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--color-ash);
+  border-top: 1px solid var(--color-mist);
+}
+
+/* "Install from Chrome Web Store" uses the standard .btn .btn-primary
+   styles; this modifier only adds layout (full width + top spacing). */
+.install-tool-cta {
+  margin-top: var(--spacing-sm);
+  width: 100%;
 }
 
 .install-alts-label {

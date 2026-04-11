@@ -377,8 +377,8 @@ async function buildStaticSite(extraEntrypoints = []) {
 /**
  * Assemble universal directory from all provider outputs
  */
-function assembleUniversal(distDir, suffix = '') {
-  const universalDir = path.join(distDir, `universal${suffix}`);
+function assembleUniversal(distDir) {
+  const universalDir = path.join(distDir, 'universal');
 
   // Clean and recreate
   if (fs.existsSync(universalDir)) {
@@ -388,7 +388,7 @@ function assembleUniversal(distDir, suffix = '') {
   const providerConfigs = Object.values(PROVIDERS);
 
   for (const { provider, configDir } of providerConfigs) {
-    const src = path.join(distDir, `${provider}${suffix}`, configDir);
+    const src = path.join(distDir, provider, configDir);
     const dest = path.join(universalDir, configDir);
     if (fs.existsSync(src)) {
       copyDirSync(src, dest);
@@ -397,30 +397,28 @@ function assembleUniversal(distDir, suffix = '') {
 
   // Add a visible README so macOS users don't see an empty folder
   // (all provider dirs are dotfiles, hidden by default in Finder)
-  const prefixNote = suffix ? '\nSkills in this bundle are prefixed with i- (e.g. /i-audit) to avoid conflicts.\n' : '';
   fs.writeFileSync(path.join(universalDir, 'README.txt'),
-`Impeccable — Design fluency for AI harnesses
+`Impeccable. Design fluency for AI harnesses.
 https://impeccable.style
-${prefixNote}
+
 This folder contains skills for all supported tools:
 
-  .cursor/    → Cursor
-  .claude/    → Claude Code
-  .gemini/    → Gemini CLI
-  .codex/     → Codex CLI
-  .agents/    → VS Code Copilot, Antigravity
-  .kiro/      → Kiro
-  .opencode/  → OpenCode
-  .pi/        → Pi
-  .trae-cn/   → Trae China
-  .trae/      → Trae International
+  .cursor/    -> Cursor
+  .claude/    -> Claude Code
+  .gemini/    -> Gemini CLI
+  .codex/     -> Codex CLI
+  .agents/    -> VS Code Copilot, Antigravity
+  .kiro/      -> Kiro
+  .opencode/  -> OpenCode
+  .pi/        -> Pi
+  .trae-cn/   -> Trae China
+  .trae/      -> Trae International
 
 To install, copy the relevant folder(s) into your project root.
-These are hidden folders (dotfiles) — press Cmd+Shift+. in Finder to see them.
+These are hidden folders (dotfiles). Press Cmd+Shift+. in Finder to see them.
 `);
 
-  const label = suffix ? ' (prefixed)' : '';
-  console.log(`✓ Assembled universal${label} directory (${providerConfigs.length} providers)`);
+  console.log(`✓ Assembled universal directory (${providerConfigs.length} providers)`);
 }
 
 /**
@@ -644,16 +642,14 @@ async function build() {
   const pluginJson = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, '.claude-plugin/plugin.json'), 'utf-8'));
   const skillsVersion = pluginJson.version;
 
-  // Transform for each provider (unprefixed + prefixed)
+  // Transform for each provider
   for (const config of Object.values(PROVIDERS)) {
     const transform = createTransformer(config);
     transform(skills, DIST_DIR, { skillsVersion });
-    transform(skills, DIST_DIR, { prefix: 'i-', outputSuffix: '-prefixed', skillsVersion });
   }
 
-  // Assemble universal directory (unprefixed and prefixed)
+  // Assemble universal directory
   assembleUniversal(DIST_DIR);
-  assembleUniversal(DIST_DIR, '-prefixed');
 
   // Create ZIP bundles (individual + universal)
   await createAllZips(DIST_DIR);

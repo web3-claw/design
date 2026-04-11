@@ -68,7 +68,7 @@ source/                          -> dist/
   skills/{name}/SKILL.md           {provider}/{configDir}/skills/{name}/SKILL.md
 ```
 
-Each provider gets its own output directory. Two variants are generated per provider: unprefixed and prefixed (with `i-` prefix for skill names).
+Each provider gets its own output directory.
 
 ## Build System Details
 
@@ -130,7 +130,6 @@ scripts/
 - `readSourceFiles()`: Reads all skill directories from `source/skills/`
 - `replacePlaceholders()`: Substitutes `{{model}}`, `{{config_file}}`, etc. per provider
 - `generateYamlFrontmatter()`: Serializes objects to YAML frontmatter (auto-quotes values starting with `[` or `{`)
-- `prefixSkillReferences()`: Replaces `/skillname` with `/i-skillname` for prefixed variants
 
 ## Best Practices
 
