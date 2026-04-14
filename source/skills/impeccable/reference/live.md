@@ -105,17 +105,46 @@ The command outputs JSON with the file path and the insert line:
 
 If `wrap` fails, fall back to manual grep + edit.
 
-### Step 2: Generate all variants and write them in a SINGLE edit
+### Step 2a: MANDATORY — Load the action's reference file
 
-1. **Load the design command's reference file.** If `event.action` is "bolder", load `reference/bolder.md`. If "impeccable" (the default), use the main design principles from this skill without loading a sub-command reference.
+**This step is non-negotiable.** Before generating anything, you MUST load the reference file for `event.action`:
 
-2. **Generate ALL variants at once.** For each variant, create a complete HTML replacement of the original element. Consider the element's context (computed styles, parent structure, CSS custom properties from `event.element`).
+- `event.action` is "impeccable" (default, no sub-command chosen): use the main design principles from `SKILL.md` (already loaded). Do NOT load a sub-command reference.
+- `event.action` is any other value (e.g. "bolder", "quieter", "distill", "polish", "typeset", "colorize", "layout", "adapt", "animate", "delight", "overdrive"): use Read to load `reference/<action>.md` right now. Do not proceed until it's in context.
 
-3. **Diversify across variants.** Each variant should take a distinctly different approach. For "bolder", one might focus on type weight, another on color saturation, another on spatial scale, another on structural change. Do NOT generate N variations on the same idea.
+Skipping this step is a critical failure. The sub-commands exist precisely because the generic "impeccable" prompt produces generic variants. Each action encodes a specific design discipline — ignoring the reference file means ignoring what the user asked for.
 
-4. **If a freeform prompt was provided** (`event.freeformPrompt`), use it as additional guidance for all variants.
+### Step 2b: Plan 3+ distinctly different directions BEFORE writing any code
 
-5. **Write CSS + HTML together in a SINGLE edit** at the insert line reported by `wrap`. Colocate any scoped CSS inside the variant wrapper as a `<style>` tag. `<style>` tags work anywhere in the document in all modern browsers, and this ensures CSS and HTML arrive atomically (no flash of unstyled content).
+Before writing the first variant, write out (in your own head or as a short plan) the distinct direction each variant will take. Each direction must differ on at least ONE of these **structural axes**, not just superficial styling:
+
+1. **Hierarchy**: which element is the focal point? (title-first, number-first, image-first, quote-first)
+2. **Layout topology**: how are pieces arranged? (stacked, side-by-side, inline, grid, magazine-columns, overlay)
+3. **Typographic system**: different font pairing, different scale ratios, different case/weight strategy
+4. **Color strategy**: different palette hue, different accent placement, different contrast profile (not just "a slightly different shade of the same accent")
+5. **Density**: minimal vs. dense vs. editorial whitespace
+6. **Tone/personality**: refined/editorial vs. brutalist/raw vs. soft/pastel vs. technical/utilitarian vs. playful
+7. **Structural decomposition**: combining multiple pieces vs. splitting into more pieces vs. hiding secondary info behind progressive disclosure
+
+**Rule of thumb**: if you can summarize two variants in the same one-line description (e.g. "rose accent on the title"), they are too similar. Redo one.
+
+For action-specific rules:
+- `bolder`: each variant amplifies a DIFFERENT dimension (one goes huge on scale, one on color saturation, one on structural change). Do not make three "slightly bigger" variants.
+- `quieter`: each variant pulls back a DIFFERENT dimension (one strips color, one strips ornament, one widens the spacing).
+- `animate`: each variant uses a DIFFERENT motion vocabulary (one cascades, one clips/wipes, one scales/resolves). Not three staggered fades.
+- `colorize`: each variant uses a DIFFERENT hue family (not three shades of the same hue).
+- `typeset`: each variant uses a DIFFERENT type pairing and a DIFFERENT scale ratio.
+- `layout`: each variant changes structural arrangement, not spacing tweaks.
+
+### Step 2c: Apply the freeform prompt (if present)
+
+If `event.freeformPrompt` is set, treat it as the user's ceiling on direction — all variants must honor it — but the variants still need to explore meaningfully different *interpretations* of that direction. Example: prompt "make it feel like a newspaper front page" → variant 1 = broadsheet masthead + rule-divided columns, variant 2 = tabloid headline + single dominant image, variant 3 = minimalist editorial with oversized drop cap. Not three newspapers in the same voice.
+
+### Step 2d: Generate ALL variants and write them in a SINGLE edit
+
+For each variant, create a complete HTML replacement of the original element. Consider the element's context (computed styles, parent structure, CSS custom properties from `event.element`).
+
+Write CSS + HTML together in a SINGLE edit at the insert line reported by `wrap`. Colocate any scoped CSS inside the variant wrapper as a `<style>` tag. `<style>` tags work anywhere in the document in all modern browsers, and this ensures CSS and HTML arrive atomically (no flash of unstyled content).
 
 ```html
 <!-- Variants: insert below this line -->
