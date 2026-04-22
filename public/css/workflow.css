@@ -1247,12 +1247,10 @@
   font-size: 1.125rem;
   font-weight: 500;
   color: var(--color-ink);
-  padding: var(--spacing-md) 0;
+  padding: var(--spacing-md) calc(var(--spacing-md) + 1.5rem) var(--spacing-md) 0;
   cursor: pointer;
   list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: relative;
   transition: color 0.2s ease;
 }
 
@@ -1267,10 +1265,14 @@
   font-weight: 300;
   color: var(--color-accent);
   transition: transform 0.3s var(--ease-out);
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .faq-item[open] .faq-question::after {
-  transform: rotate(45deg);
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .faq-question:hover {
