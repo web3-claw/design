@@ -13,6 +13,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { isGeneratedFile } from './is-generated.mjs';
 
 const EXTENSIONS = ['.html', '.jsx', '.tsx', '.vue', '.svelte', '.astro'];
 
@@ -62,19 +63,52 @@ The agent should insert variant HTML at insertLine.`);
   // Build search queries in priority order (most specific first)
   const queries = buildSearchQueries(elementId, classes, tag, query);
 
-  // Find the source file
+  const genOpts = { cwd: process.cwd() };
+
+  // Find the source file. Generated files are excluded from auto-search so we
+  // don't silently write variants into a file the next build will wipe.
   let targetFile = filePath;
   let matchedQuery = null;
   if (!targetFile) {
     for (const q of queries) {
-      targetFile = findFileWithQuery(q, process.cwd());
+      targetFile = findFileWithQuery(q, process.cwd(), genOpts);
       if (targetFile) { matchedQuery = q; break; }
     }
     if (!targetFile) {
-      console.error(JSON.stringify({ error: 'Could not find element in project files. Searched for: ' + queries.join(', ') }));
+      // Nothing in source. Did the element show up in a generated file? That
+      // tells the agent "fall back to the agent-driven flow" vs "element just
+      // doesn't exist in this project."
+      let generatedHit = null;
+      for (const q of queries) {
+        generatedHit = findFileWithQuery(q, process.cwd(), { ...genOpts, includeGenerated: true });
+        if (generatedHit) break;
+      }
+      if (generatedHit) {
+        console.error(JSON.stringify({
+          error: 'element_not_in_source',
+          fallback: 'agent-driven',
+          generatedMatch: path.relative(process.cwd(), generatedHit),
+          hint: 'Element found only in a generated file. See "Handle fallback" in live.md.',
+        }));
+      } else {
+        console.error(JSON.stringify({
+          error: 'element_not_found',
+          fallback: 'agent-driven',
+          hint: 'Element not found in any project file. It may be runtime-injected (JS component, etc.). See "Handle fallback" in live.md.',
+        }));
+      }
       process.exit(1);
     }
   } else {
+    if (isGeneratedFile(targetFile, genOpts)) {
+      console.error(JSON.stringify({
+        error: 'file_is_generated',
+        fallback: 'agent-driven',
+        file: path.relative(process.cwd(), path.resolve(process.cwd(), targetFile)),
+        hint: 'Explicit --file points at a generated file. Writing here gets wiped by the next build. See "Handle fallback" in live.md.',
+      }));
+      process.exit(1);
+    }
     matchedQuery = queries[0];
   }
 
@@ -195,20 +229,20 @@ function detectCommentSyntax(filePath) {
  * Search project files for the query string (class name, ID, etc.)
  * Returns the first matching file path, or null.
  */
-function findFileWithQuery(query, cwd) {
+function findFileWithQuery(query, cwd, genOpts = {}) {
   const searchDirs = ['src', 'app', 'pages', 'components', 'public', 'views', 'templates', '.'];
   const seen = new Set();
 
   for (const dir of searchDirs) {
     const absDir = path.join(cwd, dir);
     if (!fs.existsSync(absDir)) continue;
-    const result = searchDir(absDir, query, seen, 0);
+    const result = searchDir(absDir, query, seen, 0, genOpts);
     if (result) return result;
   }
   return null;
 }
 
-function searchDir(dir, query, seen, depth) {
+function searchDir(dir, query, seen, depth, genOpts) {
   if (depth > 5) return null; // don't go too deep
   const realDir = fs.realpathSync(dir);
   if (seen.has(realDir)) return null;
@@ -225,6 +259,7 @@ function searchDir(dir, query, seen, depth) {
     if (!EXTENSIONS.includes(ext)) continue;
 
     const filePath = path.join(dir, entry.name);
+    if (!genOpts.includeGenerated && isGeneratedFile(filePath, genOpts)) continue;
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
       if (content.includes(query)) return filePath;
@@ -235,7 +270,7 @@ function searchDir(dir, query, seen, depth) {
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === 'dist' || entry.name === 'build') continue;
-    const result = searchDir(path.join(dir, entry.name), query, seen, depth + 1);
+    const result = searchDir(path.join(dir, entry.name), query, seen, depth + 1, genOpts);
     if (result) return result;
   }
 

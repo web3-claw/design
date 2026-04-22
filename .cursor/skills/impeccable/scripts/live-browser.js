@@ -732,13 +732,26 @@
     const r = selectedElement.getBoundingClientRect();
     const barH = barEl.offsetHeight || 44;
     const barW = barEl.offsetWidth || 380;
-    let top = r.bottom + 8;
+    const GLOBAL_BAR_RESERVE = 64; // global bar height + bottom margin + breathing room
+    const GAP = 8;
+
+    // Prefer below the element; fall back to above; if neither fits (element
+    // taller than viewport), pin to a stable viewport anchor so the bar
+    // doesn't teleport between top and bottom as the user scrolls.
+    let top;
+    const belowTop = r.bottom + GAP;
+    const aboveTop = r.top - barH - GAP;
+    if (belowTop + barH + GAP <= window.innerHeight - GLOBAL_BAR_RESERVE) {
+      top = belowTop;
+    } else if (aboveTop >= GAP) {
+      top = aboveTop;
+    } else {
+      top = window.innerHeight - barH - GLOBAL_BAR_RESERVE;
+    }
+
     let left = r.left + (r.width - barW) / 2;
-    // Keep in viewport
-    if (top + barH + 8 > window.innerHeight) top = r.top - barH - 8;
-    if (top < 8) top = 8;
-    if (left < 8) left = 8;
-    if (left + barW > window.innerWidth - 8) left = window.innerWidth - barW - 8;
+    if (left < GAP) left = GAP;
+    if (left + barW > window.innerWidth - GAP) left = window.innerWidth - barW - GAP;
     Object.assign(barEl.style, { top: top + 'px', left: left + 'px' });
   }
 
@@ -1251,6 +1264,7 @@
         selectedElement = pickVariantContent(wrapper, 1) || wrapper.parentElement;
 
         state = 'CYCLING';
+        hideShaderOverlay();
         updateBarContent('cycling');
         saveSession();
         console.log('[impeccable] Injected ' + arrivedVariants + ' variants from source file.');
@@ -1514,6 +1528,28 @@
     showAnnotOverlay(selectedElement);
     showBar('configure');
     startScrollTracking();
+    maybePrefetchPage();
+  }
+
+  // Fire a lightweight prefetch event the first time the user selects an
+  // element on a given route. The agent uses this to Read the underlying file
+  // into context before Go is hit, shaving the read off the critical path.
+  // Dedupe per session by pathname — clicking around on the same page doesn't
+  // re-fire.
+  //
+  // DISABLED: quick-Go workflows pay an extra harness round trip because
+  // prefetch + generate arrive as two events instead of one. Re-enable with
+  // a browser-side debounce (~800–1000ms, cancelled on Go) if we want to
+  // resurrect this. Server validator and skill dispatch remain in place so
+  // flipping this flag is the only change needed.
+  const PREFETCH_ENABLED = false;
+  const prefetchedPaths = new Set();
+  function maybePrefetchPage() {
+    if (!PREFETCH_ENABLED) return;
+    const path = location.pathname;
+    if (prefetchedPaths.has(path)) return;
+    prefetchedPaths.add(path);
+    sendEvent({ type: 'prefetch', pageUrl: path });
   }
 
   function handleKeyDown(e) {

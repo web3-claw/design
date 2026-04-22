@@ -87,7 +87,7 @@ The agent should then:
     ok: true,
     serverPort: serverInfo.port,
     serverToken: serverInfo.token,
-    pageFile: checkResult.config.file,
+    pageFiles: checkResult.config.files,
     hasProduct: ctx.hasProduct,
     product: ctx.product,
     productPath: ctx.productPath,

@@ -46,12 +46,20 @@ Output (JSON):
       console.log(JSON.stringify({ ok: false, error: 'config_missing', path: CONFIG_PATH }));
       process.exit(0);
     }
+    let cfg;
     try {
-      const cfg = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
-      console.log(JSON.stringify({ ok: true, config: cfg, path: CONFIG_PATH }));
+      cfg = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
     } catch (err) {
-      console.log(JSON.stringify({ ok: false, error: 'config_invalid', message: err.message }));
+      console.log(JSON.stringify({ ok: false, error: 'config_invalid', message: err.message, path: CONFIG_PATH }));
+      return;
     }
+    try {
+      validateConfig(cfg);
+    } catch (err) {
+      console.log(JSON.stringify({ ok: false, error: 'config_invalid', message: err.message, path: CONFIG_PATH }));
+      return;
+    }
+    console.log(JSON.stringify({ ok: true, config: cfg, path: CONFIG_PATH }));
     return;
   }
 
@@ -63,22 +71,17 @@ Output (JSON):
   const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
   validateConfig(config);
 
-  const absFile = path.resolve(process.cwd(), config.file);
-  if (!fs.existsSync(absFile)) {
-    console.error(JSON.stringify({ ok: false, error: 'file_not_found', file: config.file }));
-    process.exit(1);
-  }
-
-  const content = fs.readFileSync(absFile, 'utf-8');
-
   if (args.includes('--remove')) {
-    const updated = removeTag(content, config.commentSyntax);
-    if (updated === content) {
-      console.log(JSON.stringify({ ok: true, file: config.file, removed: false, note: 'no tag present' }));
-      return;
-    }
-    fs.writeFileSync(absFile, updated, 'utf-8');
-    console.log(JSON.stringify({ ok: true, file: config.file, removed: true }));
+    const results = config.files.map((relFile) => {
+      const absFile = path.resolve(process.cwd(), relFile);
+      if (!fs.existsSync(absFile)) return { file: relFile, error: 'file_not_found' };
+      const content = fs.readFileSync(absFile, 'utf-8');
+      const updated = removeTag(content, config.commentSyntax);
+      if (updated === content) return { file: relFile, removed: false, note: 'no tag present' };
+      fs.writeFileSync(absFile, updated, 'utf-8');
+      return { file: relFile, removed: true };
+    });
+    console.log(JSON.stringify({ ok: true, results }));
     return;
   }
 
@@ -90,15 +93,19 @@ Output (JSON):
     process.exit(1);
   }
 
-  // Already inserted? Replace to refresh the port.
-  const withoutOld = removeTag(content, config.commentSyntax);
-  const updated = insertTag(withoutOld, config, port);
-  if (updated === withoutOld) {
-    console.error(JSON.stringify({ ok: false, error: 'insertion_point_not_found', anchor: config.insertBefore }));
-    process.exit(1);
-  }
-  fs.writeFileSync(absFile, updated, 'utf-8');
-  console.log(JSON.stringify({ ok: true, file: config.file, inserted: true, port }));
+  const results = config.files.map((relFile) => {
+    const absFile = path.resolve(process.cwd(), relFile);
+    if (!fs.existsSync(absFile)) return { file: relFile, error: 'file_not_found' };
+    const content = fs.readFileSync(absFile, 'utf-8');
+    const withoutOld = removeTag(content, config.commentSyntax);
+    const updated = insertTag(withoutOld, config, port);
+    if (updated === withoutOld) return { file: relFile, error: 'insertion_point_not_found', anchor: config.insertBefore || config.insertAfter };
+    fs.writeFileSync(absFile, updated, 'utf-8');
+    return { file: relFile, inserted: true };
+  });
+  const anyInserted = results.some((r) => r.inserted);
+  console.log(JSON.stringify({ ok: anyInserted, port, results }));
+  if (!anyInserted) process.exit(1);
 }
 
 // ---------------------------------------------------------------------------
@@ -107,7 +114,12 @@ Output (JSON):
 
 function validateConfig(cfg) {
   if (!cfg || typeof cfg !== 'object') throw new Error('config.json must be an object');
-  if (typeof cfg.file !== 'string') throw new Error('config.file (string) required');
+  if (!Array.isArray(cfg.files) || cfg.files.length === 0) {
+    throw new Error('config.files (non-empty string array) required');
+  }
+  if (!cfg.files.every((f) => typeof f === 'string' && f.length > 0)) {
+    throw new Error('config.files must contain only non-empty strings');
+  }
   if (typeof cfg.insertBefore !== 'string' && typeof cfg.insertAfter !== 'string') {
     throw new Error('config.insertBefore or config.insertAfter (string) required');
   }
@@ -131,12 +143,16 @@ function buildTagBlock(syntax, port) {
 
 function insertTag(content, config, port) {
   const block = buildTagBlock(config.commentSyntax, port);
+  // insertBefore: match the LAST occurrence. Anchors like `</body>` naturally
+  // belong at the end, and the same literal can appear earlier in code blocks
+  // within rendered documentation pages.
   if (config.insertBefore) {
-    const idx = content.indexOf(config.insertBefore);
+    const idx = content.lastIndexOf(config.insertBefore);
     if (idx === -1) return content;
     return content.slice(0, idx) + block + content.slice(idx);
   }
-  // insertAfter
+  // insertAfter: match the FIRST occurrence — typical anchors like `<head>` or
+  // `<body>` open near the top of the document.
   const idx = content.indexOf(config.insertAfter);
   if (idx === -1) return content;
   const after = idx + config.insertAfter.length;

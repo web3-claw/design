@@ -28,11 +28,11 @@ Chat is overhead. No recap, no tutorial output, no pasting PRODUCT / DESIGN bodi
 node {{scripts_path}}/live.mjs
 ```
 
-Output JSON: `{ ok, serverPort, serverToken, pageFile, hasProduct, product, productPath, hasDesign, design, designPath, migrated }`. Keep PRODUCT.md and DESIGN.md in mind for variant generation — **DESIGN.md wins on visual decisions; PRODUCT.md wins on strategic/voice decisions.** If `migrated: true`, the loader auto-renamed legacy `.impeccable.md` to `PRODUCT.md`; mention this once and suggest `$impeccable document` for the matching DESIGN.md.
+Output JSON: `{ ok, serverPort, serverToken, pageFiles, hasProduct, product, productPath, hasDesign, design, designPath, migrated }`. `pageFiles` is the list of HTML entries the live script was injected into. Keep PRODUCT.md and DESIGN.md in mind for variant generation — **DESIGN.md wins on visual decisions; PRODUCT.md wins on strategic/voice decisions.** If `migrated: true`, the loader auto-renamed legacy `.impeccable.md` to `PRODUCT.md`; mention this once and suggest `$impeccable document` for the matching DESIGN.md.
 
-`serverPort` and `serverToken` belong to the small **Impeccable live helper** HTTP server (serves `/live.js`, SSE, and `/poll`). That port is **not** your dev server and is usually not the URL you open to view the app. The browser page is whatever origin serves the HTML entry (`pageFile` / Vite / Next / Bun / tunnel / LAN hostname).
+`serverPort` and `serverToken` belong to the small **Impeccable live helper** HTTP server (serves `/live.js`, SSE, and `/poll`). That port is **not** your dev server and is usually not the URL you open to view the app. The browser page is whatever origin serves one of the `pageFiles` entries (Vite / Next / Bun / tunnel / LAN hostname).
 
-If output is `{ ok: false, error: "config_missing", configPath }`, this project hasn't used live mode. See **First-time setup** at the bottom.
+If output is `{ ok: false, error: "config_missing" | "config_invalid", path }`, this project hasn't been configured for live mode (or its config is stale). See **First-time setup** at the bottom.
 
 ## Poll loop
 
@@ -44,6 +44,7 @@ LOOP:
   "generate"  → Handle Generate; reply done; LOOP
   "accept"    → Handle Accept; LOOP
   "discard"   → Handle Discard; LOOP
+  "prefetch"  → Handle Prefetch; LOOP
   "timeout"   → LOOP
   "exit"      → break → Cleanup
 ```
@@ -73,9 +74,23 @@ Reading annotations precisely:
 node {{scripts_path}}/live-wrap.mjs --id EVENT_ID --count EVENT_COUNT --element-id "ELEMENT_ID" --classes "class1,class2" --tag "div"
 ```
 
-Pass `event.element.id`, `event.element.classes` joined with commas, and `event.element.tagName`. The helper searches ID first, then classes, then tag + class combo. If `event.pageUrl` implies the file (e.g. `/` is usually `index.html`), pass `--file PATH` to skip the search.
+Flag mapping — keep them separate, don't collapse into `--query`:
 
-Output: `{ file, insertLine, commentSyntax }`. If `wrap` fails, fall back to manual grep + edit.
+- `--element-id` ← `event.element.id`
+- `--classes` ← `event.element.classes` joined with commas
+- `--tag` ← `event.element.tagName`
+
+The helper searches ID first, then classes, then tag + class combo. If `event.pageUrl` implies the file (e.g. `/` is usually `index.html`), pass `--file PATH` to skip the search. `--query` is a fallback for raw text search only — do not use it for normal element lookups.
+
+Output on success: `{ file, insertLine, commentSyntax }`.
+
+**Fallback errors.** Wrap only writes into files it judges to be source (tracked by git, not marked GENERATED, not listed in config's `generatedFiles`). If it can't land on a source file, it errors without writing — accepting a variant into a generated file is silent data loss. Three shapes:
+
+- `{ error: "file_is_generated", file, hint }` — user-supplied `--file` points at a generated file.
+- `{ error: "element_not_in_source", generatedMatch, hint }` — element exists only in a generated file (the next build would wipe any edits).
+- `{ error: "element_not_found", hint }` — element isn't in any project file; likely runtime-injected (JS component, data-driven render).
+
+All three carry `fallback: "agent-driven"`. Follow **Handle fallback** below.
 
 ### 3. Load the action's reference
 
@@ -173,23 +188,77 @@ node {{scripts_path}}/live-poll.mjs --reply EVENT_ID done --file RELATIVE_PATH
 
 Then run `live-poll.mjs` again immediately.
 
+## Handle fallback
+
+When wrap returns `fallback: "agent-driven"`, the deterministic flow doesn't apply. Pick up here.
+
+The goal is the same: give the user three variants to choose from AND persist the accepted one in a place the next build won't wipe. The difference is that you have to pick the right source file yourself.
+
+### Step 1: Identify where the element actually lives
+
+Use the error payload:
+
+- `element_not_in_source` with `generatedMatch: "public/docs/foo.html"` — the served HTML is generated. Find the generator (grep for writers of that path, e.g. `scripts/build-sub-pages.js`, an Astro/Next template) and locate the template or partial that emits this element.
+- `element_not_found` — the element is runtime-injected. Look for the component that renders it (React/Vue/Svelte), the JS that assembles it, or the data source that feeds it.
+- `file_is_generated` with `file: "..."` — user pointed at a generated file explicitly. Same resolution as `element_not_in_source`.
+
+Read the candidate source until you're confident where a change to the element would belong. If the change is purely visual, that source might be a shared stylesheet, not the template.
+
+### Step 2: Show three variants in the DOM for preview
+
+The browser bar is waiting for variants. Even without a wrapper in source, you still need to show something:
+
+1. Manually write the wrapper scaffold into the **served** file (the one the browser actually loaded). Use the same structure `live-wrap.mjs` produces — `<!-- impeccable-variants-start ID --><div data-impeccable-variants="ID" data-impeccable-variant-count="3" style="display: contents">…</div><!-- end -->`.
+2. Insert your three variant divs inside it, same shape as the deterministic path.
+3. Signal done with `--reply EVENT_ID done --file <served file>`. The browser's no-HMR fallback will fetch and inject.
+
+This served-file edit is **temporary** — next regen wipes it, and that's fine. The real work happens on accept.
+
+### Step 3: On accept, write to true source
+
+When the accept event arrives (`_acceptResult.handled` will usually be `false` here because accept also refuses to persist into generated files — see Handle accept for the carbonize branch), extract the accepted variant's content and write it into the source you identified in Step 1:
+
+- Structural change → edit the template / component source.
+- Visual-only change → add or update rules in the appropriate stylesheet; remove the inline `<style>` scope.
+- Data-driven → update the data source or the render logic.
+
+Then remove the temporary wrapper from the served file if it's still there.
+
+### Step 4: On discard, clean up the served file
+
+Remove the wrapper you inserted in Step 2. Nothing else to do.
+
 ## Handle `accept`
 
 Event: `{id, variantId, _acceptResult}`. The poll script already ran `live-accept.mjs` to handle the file operation deterministically; the browser DOM is already updated.
 
 - `_acceptResult.handled: true` and `carbonize: false` — nothing to do. Poll again.
-- `_acceptResult.handled: true` and `carbonize: true` — the accepted variant has an inline `<style>` block marked with `impeccable-carbonize-start` / `impeccable-carbonize-end` comments. Spawn a **background agent** to:
+- `_acceptResult.handled: true` and `carbonize: true` — the accepted variant has an inline `<style>` block marked with `impeccable-carbonize-start` / `impeccable-carbonize-end` comments. The accepted content itself is wrapped in a `<div data-impeccable-variant="N" style="display: contents">` so the existing `@scope ([data-impeccable-variant="N"])` rules keep rendering correctly until carbonize runs — the user sees the accepted design immediately, no visual gap. Spawn a **background agent** to:
   1. Find the carbonize markers in the file.
   2. Move the CSS rules into the project's proper stylesheet(s).
   3. Rewrite `@scope` selectors to use the element's real classes instead of `[data-impeccable-variant]`.
-  4. Remove any helper classes/attributes (e.g. `data-impeccable-variant`) from the accepted HTML.
+  4. Remove the `<div data-impeccable-variant="N">` wrapper and any helper classes/attributes from the accepted HTML.
   5. Delete the carbonize markers and inline `<style>` block.
   Poll again immediately; don't wait for the background agent.
-- `_acceptResult.handled: false` — manual cleanup: read file, find markers, edit.
+- `_acceptResult.handled: false, mode: "fallback"` — the session lived in a generated file and the script refused to persist there. You've already written the accepted variant into true source during Handle fallback Step 3; just clean up the temporary wrapper in the served file if any, and poll again.
+- `_acceptResult.handled: false` without `mode` — manual cleanup: read file, find markers, edit.
 
 ## Handle `discard`
 
 Event: `{id, _acceptResult}`. The poll script already restored the original and removed all variant markers. Nothing to do. Poll again.
+
+## Handle `prefetch`
+
+Event: `{pageUrl}`. The browser fires this the first time the user selects an element on a given route, as a latency shortcut — it signals the user is likely about to Go on a page you haven't read yet.
+
+Resolve `pageUrl` to the underlying file:
+
+- Root `/` → the `pageFile` returned by `live.mjs` (usually `public/index.html` or equivalent).
+- Sub-routes (e.g. `/docs`, `/docs/live`) → the generated or source file for that route. Use your knowledge of the project layout (multi-page static sites often resolve `/foo` → `public/foo/index.html`; SPAs may map all routes to a single entry).
+
+Read the file into context, then poll again. No `--reply` — this is speculative pre-work; Go will come later. If you can't confidently resolve the route to a file, skip and poll again.
+
+Dedupe is the browser's job (one prefetch per unique pathname per session) — trust it. If the same file shows up twice from different routes mapping to the same file, the second Read is cached anyway.
 
 ## Exit
 
@@ -212,19 +281,34 @@ Then:
 - Remove any leftover variant wrappers (search for `impeccable-variants-start` markers).
 - Remove any leftover carbonize blocks (search for `impeccable-carbonize-start` markers).
 
-## First-time setup (config missing)
+## First-time setup (config missing or invalid)
 
-If `live.mjs` outputs `{ ok: false, error: "config_missing", configPath }`, create the config at the reported path based on the project's framework:
+If `live.mjs` outputs `{ ok: false, error: "config_missing" | "config_invalid", path }`, write `config.json` at the reported path.
 
-| Framework | `file` | `insertBefore` | `commentSyntax` |
-|-----------|--------|----------------|-----------------|
-| Plain HTML | `index.html` | `</body>` | `html` |
-| Vite / React | `index.html` | `</body>` | `html` |
-| Next.js (App Router) | `app/layout.tsx` | `</body>` | `jsx` |
-| Next.js (Pages) | `pages/_document.tsx` | `</body>` | `jsx` |
-| Nuxt | `app.vue` | `</body>` | `html` |
-| Svelte / SvelteKit | `src/app.html` | `</body>` | `html` |
-| Astro | the root layout `.astro` file | `</body>` | `html` |
-| Static site with a non-root HTML file | e.g. `public/index.html` | `</body>` | `html` |
+Schema:
 
-Use `insertAfter` instead of `insertBefore` if the anchor should match **after** a specific line. Then re-run `live.mjs`.
+```json
+{
+  "files": ["<path>", "<path>", ...],
+  "insertBefore": "</body>",
+  "commentSyntax": "html"
+}
+```
+
+`files` is the inject target — **the HTML files the browser actually loads**, not necessarily source. Tracked or generated doesn't matter here; wrap has its own generated-file guard and routes accepts through the fallback flow.
+
+| Framework | `files` | `insertBefore` | `commentSyntax` |
+|-----------|---------|----------------|-----------------|
+| SPA with single shell (Vite / React / Plain HTML) | `["index.html"]` | `</body>` | `html` |
+| Next.js (App Router) | `["app/layout.tsx"]` | `</body>` | `jsx` |
+| Next.js (Pages) | `["pages/_document.tsx"]` | `</body>` | `jsx` |
+| Nuxt | `["app.vue"]` | `</body>` | `html` |
+| Svelte / SvelteKit | `["src/app.html"]` | `</body>` | `html` |
+| Astro | `[" <root layout .astro>"]` | `</body>` | `html` |
+| Multi-page (separate HTML per route) | Every HTML file the dev server serves — glob the output dir, e.g. `public/**/*.html` | `</body>` | `html` |
+
+Pick an anchor that exists in every file (`</body>` almost always works). Use `insertAfter` if the anchor should match **after** a specific line.
+
+For multi-page sites whose pages are *rebuilt* by a generator (Astro, static-site generators, custom scripts like `build-sub-pages.js`), the inject survives only until the next regeneration. Re-run `live.mjs` after each build. Accept is unaffected — it writes to true source via the fallback flow.
+
+Then re-run `live.mjs`.

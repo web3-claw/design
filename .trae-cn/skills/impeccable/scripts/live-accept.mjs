@@ -15,6 +15,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { isGeneratedFile } from './is-generated.mjs';
 
 const EXTENSIONS = ['.html', '.jsx', '.tsx', '.vue', '.svelte', '.astro'];
 
@@ -58,6 +59,20 @@ Output (JSON):
 
   const { file: targetFile, content, lines } = found;
   const relFile = path.relative(process.cwd(), targetFile);
+
+  // Bail if the session lives in a generated file. The agent manually wrote
+  // the wrapper there for preview, and is responsible for writing the
+  // accepted variant to true source (or cleaning up on discard). See
+  // "Handle fallback" in live.md.
+  if (isGeneratedFile(targetFile, { cwd: process.cwd() })) {
+    console.log(JSON.stringify({
+      handled: false,
+      mode: 'fallback',
+      file: relFile,
+      hint: 'Session is in a generated file. Persist the accepted variant in source; do not rely on this script.',
+    }));
+    process.exit(0);
+  }
 
   if (isDiscard) {
     const result = handleDiscard(id, lines, targetFile);
@@ -131,7 +146,18 @@ function handleAccept(id, variantNum, lines, targetFile) {
     replacement.push(indent + commentSyntax.open + ' impeccable-carbonize-end ' + id + ' ' + commentSyntax.close);
   }
 
-  replacement.push(...restored);
+  // Keep the `@scope ([data-impeccable-variant="N"])` selectors in the
+  // carbonize CSS block working visually by re-wrapping the accepted content
+  // in a data-impeccable-variant="N" div with `display: contents` (so layout
+  // isn't affected). The carbonize agent strips this attribute + wrapper when
+  // it moves the CSS to a proper stylesheet.
+  if (cssContent) {
+    replacement.push(indent + '<div data-impeccable-variant="' + variantNum + '" style="display: contents">');
+    replacement.push(...restored);
+    replacement.push(indent + '</div>');
+  } else {
+    replacement.push(...restored);
+  }
 
   const newLines = [
     ...lines.slice(0, block.start),
@@ -168,14 +194,25 @@ function findMarkerBlock(id, lines) {
 /**
  * Extract the original element content from within the variant wrapper.
  * Returns an array of lines (still indented as stored in the wrapper).
+ *
+ * CSS inside a <style> block can reference `data-impeccable-variant="N"` via
+ * `@scope`, which would falsely match the HTML div we're looking for — so skip
+ * style regions entirely.
  */
 function extractOriginal(lines, block) {
   let inOriginal = false;
+  let inStyle = false;
   let depth = 0;
   const content = [];
 
   for (let i = block.start; i <= block.end; i++) {
     const line = lines[i];
+
+    if (!inStyle && /<style[\s>]/.test(line)) { inStyle = true; continue; }
+    if (inStyle) {
+      if (line.trimStart().startsWith('</style>')) inStyle = false;
+      continue;
+    }
 
     if (!inOriginal && line.includes('data-impeccable-variant="original"')) {
       inOriginal = true;
@@ -200,14 +237,23 @@ function extractOriginal(lines, block) {
 /**
  * Extract a specific variant's inner content (stripping the wrapper div).
  * Returns an array of lines, or null if not found.
+ *
+ * Skip <style> blocks — see extractOriginal for why.
  */
 function extractVariant(lines, block, variantNum) {
   let inVariant = false;
+  let inStyle = false;
   let depth = 0;
   const content = [];
 
   for (let i = block.start; i <= block.end; i++) {
     const line = lines[i];
+
+    if (!inStyle && /<style[\s>]/.test(line)) { inStyle = true; continue; }
+    if (inStyle) {
+      if (line.trimStart().startsWith('</style>')) inStyle = false;
+      continue;
+    }
 
     if (!inVariant && line.includes('data-impeccable-variant="' + variantNum + '"')) {
       inVariant = true;

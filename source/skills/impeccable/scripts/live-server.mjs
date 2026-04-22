@@ -151,6 +151,9 @@ function validateEvent(msg) {
       return msg.id ? null : 'discard: missing id';
     case 'exit':
       return null;
+    case 'prefetch':
+      if (!msg.pageUrl || typeof msg.pageUrl !== 'string') return 'prefetch: missing pageUrl';
+      return null;
     default:
       return 'Unknown event type: ' + msg.type;
   }
