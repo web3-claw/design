@@ -99,6 +99,40 @@
   let scrollLockRaf = null;
   let scrollLockAbort = null;
 
+  // Dedicated key for scroll position — SEPARATE from LS_KEY so that
+  // saveSession's state updates don't clobber a carefully-captured scrollY.
+  // (Previously: saveSession wrote scrollY alongside state, so every call
+  // during resume overwrote the pre-reload value with whatever the browser
+  // had landed on, typically 0.)
+  const SCROLL_KEY_SUFFIX = '-scroll';
+  function writeScrollY(y) {
+    try { localStorage.setItem(LS_KEY + SCROLL_KEY_SUFFIX, String(y)); } catch {}
+  }
+  function readScrollY() {
+    try {
+      const raw = localStorage.getItem(LS_KEY + SCROLL_KEY_SUFFIX);
+      if (raw == null) return null;
+      const n = parseFloat(raw);
+      return isFinite(n) ? n : null;
+    } catch { return null; }
+  }
+  function clearScrollY() {
+    try { localStorage.removeItem(LS_KEY + SCROLL_KEY_SUFFIX); } catch {}
+  }
+
+  // Pre-empt the browser: apply manual scroll restoration and jump to the
+  // saved scrollY at script-parse time (before DOMContentLoaded). If we
+  // wait until init(), the browser has already begun animating its own
+  // restore — especially bad when `scroll-behavior: smooth` is set on html.
+  try {
+    history.scrollRestoration = 'manual';
+    const savedY = readScrollY();
+    if (savedY != null && Math.abs(window.scrollY - savedY) > 0.5) {
+      console.log('[impeccable.scroll] early restore', { from: window.scrollY, to: savedY });
+      window.scrollTo({ top: savedY, left: 0, behavior: 'instant' });
+    }
+  } catch {}
+
   // UI refs
   let highlightEl = null;
   let tooltipEl = null;
@@ -1378,21 +1412,35 @@
       document.body.style.overflowAnchor = prevBodyAnchor;
     }, { once: true });
     const sig = { signal: scrollLockAbort.signal };
+    // Track whether the most recent scroll came from a user gesture. We
+    // gate user-scroll re-anchoring on this flag so programmatic smooth
+    // scrolls (browser reload-restore, scrollIntoView from other scripts)
+    // don't accidentally update our target.
+    let userGestureAt = 0;
+    const USER_GESTURE_WINDOW_MS = 250;
+
     const reanchor = (why) => {
       if (scrollLockRaf != null) { cancelAnimationFrame(scrollLockRaf); scrollLockRaf = null; }
       const prevTarget = scrollLockTargetY;
       scrollLockTargetY = window.scrollY;
+      writeScrollY(scrollLockTargetY);
       console.log('[impeccable.scroll] reanchor', { why, prevTarget, newTarget: scrollLockTargetY });
     };
-    window.addEventListener('wheel', () => reanchor('wheel'), { passive: true, ...sig });
-    window.addEventListener('touchstart', () => reanchor('touchstart'), { passive: true, ...sig });
-    window.addEventListener('touchmove', () => reanchor('touchmove'), { passive: true, ...sig });
+    const markGesture = (why) => {
+      userGestureAt = performance.now();
+      reanchor(why);
+    };
+    window.addEventListener('wheel', () => markGesture('wheel'), { passive: true, ...sig });
+    window.addEventListener('touchstart', () => markGesture('touchstart'), { passive: true, ...sig });
+    window.addEventListener('touchmove', () => markGesture('touchmove'), { passive: true, ...sig });
     window.addEventListener('keydown', (e) => {
-      if (['PageDown', 'PageUp', ' ', 'End', 'Home', 'ArrowDown', 'ArrowUp'].includes(e.key)) reanchor('key:' + e.key);
+      if (['PageDown', 'PageUp', ' ', 'End', 'Home', 'ArrowDown', 'ArrowUp'].includes(e.key)) markGesture('key:' + e.key);
     }, sig);
 
-    // Also track raw scroll events for diagnostic — shows whether Bun or
-    // some other mechanism is programmatically scrolling.
+    // Correct on EVERY scroll event: whether it's the browser's
+    // post-reload animated restore or some other script calling
+    // scrollIntoView, we want to snap back immediately. Only skip if a
+    // user gesture fired in the last 250ms.
     let lastLoggedScrollY = window.scrollY;
     window.addEventListener('scroll', () => {
       const now = window.scrollY;
@@ -1400,9 +1448,19 @@
         console.log('[impeccable.scroll] scroll event', { from: lastLoggedScrollY, to: now, targetY: scrollLockTargetY });
         lastLoggedScrollY = now;
       }
+      if (scrollLockTargetY == null) return;
+      if (performance.now() - userGestureAt < USER_GESTURE_WINDOW_MS) return;
+      if (Math.abs(now - scrollLockTargetY) < 0.5) return;
+      console.log('[impeccable.scroll] scroll-event snap', { from: now, to: scrollLockTargetY });
+      window.scrollTo({ top: scrollLockTargetY, left: window.scrollX, behavior: 'instant' });
     }, { passive: true, ...sig });
 
-    schedule('initial');
+    // Apply target synchronously, not via rAF — racing the browser's
+    // restore or a smooth-scroll animation means we want to win now.
+    if (Math.abs(window.scrollY - scrollLockTargetY) > 0.5) {
+      window.scrollTo({ top: scrollLockTargetY, left: window.scrollX, behavior: 'instant' });
+      console.log('[impeccable.scroll] startScrollLock initial apply', { to: scrollLockTargetY });
+    }
   }
 
   function stopScrollLock() {
@@ -1410,6 +1468,7 @@
     if (scrollLockRaf != null) { cancelAnimationFrame(scrollLockRaf); scrollLockRaf = null; }
     if (scrollLockAbort) { scrollLockAbort.abort(); scrollLockAbort = null; }
     scrollLockTargetY = null;
+    clearScrollY();
   }
 
   // ---------------------------------------------------------------------------
@@ -1773,6 +1832,7 @@
     state = 'GENERATING';
     showBar('generating');
     saveSession();
+    writeScrollY(window.scrollY);
     if (variantObserver) variantObserver.disconnect();
     variantObserver = startVariantObserver(currentSessionId);
     console.log('[impeccable.scroll] Go pressed', { scrollY: window.scrollY, sessionId: currentSessionId });
@@ -2239,6 +2299,8 @@ void main() {
 
   function saveSession() {
     if (!currentSessionId) return;
+    // NOTE: scrollY is stored under a separate key (writeScrollY). Storing
+    // it here would overwrite the Go-time value every time state changes.
     try {
       localStorage.setItem(LS_KEY, JSON.stringify({
         id: currentSessionId,
@@ -2248,7 +2310,6 @@ void main() {
         expected: expectedVariants,
         arrived: arrivedVariants,
         visible: visibleVariant,
-        scrollY: window.scrollY,
       }));
     } catch { /* quota exceeded or private mode */ }
   }
@@ -2405,7 +2466,7 @@ void main() {
 
     // Hold the target at its saved viewport top through any subsequent
     // HMR patches, variant inserts, or cycle swaps.
-    startScrollLock(currentSessionId, saved?.scrollY);
+    startScrollLock(currentSessionId, readScrollY());
 
     // If we reloaded mid-generation (Bun's HTML HMR destroys the shader
     // canvas), re-capture the original's content and restart the shader so
