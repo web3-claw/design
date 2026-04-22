@@ -1383,6 +1383,16 @@
   align-items: start;
 }
 
+.why-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.why-left .section-header {
+  margin-bottom: 0;
+}
+
 .why-tabs {
   list-style: none;
   padding: 0;
@@ -1390,11 +1400,10 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-top: 1px solid var(--color-mist);
 }
 
-.why-tabs li {
-  border-bottom: 1px solid var(--color-mist);
+.why-tabs li + li {
+  border-top: 1px solid var(--color-mist);
 }
 
 .why-tab {
@@ -1440,7 +1449,6 @@
 
 .why-tab.is-active {
   color: var(--color-ink);
-  border-left-color: var(--color-accent);
 }
 
 .why-tab.is-active .why-tab-num {
@@ -1577,13 +1585,22 @@
   transform: scaleY(0);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 180ms var(--ease-out);
+  transition: opacity 220ms var(--ease-out);
 }
 
 .why-tab { position: relative; }
-.why-tab.is-active .why-tab-progress { opacity: 1; }
+
+/* Active tab always shows the accent column. When cycling, the column
+   fills from top to bottom over the cycle window. When not cycling
+   (user paused or clicked), it stays full-height so the active state
+   is unambiguous. */
+.why-tab.is-active .why-tab-progress {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
 .why-tab.is-active.is-cycling .why-tab-progress {
-  animation: whyTabProgress var(--why-cycle-ms, 7000ms) linear forwards;
+  animation: whyTabProgress var(--why-cycle-ms, 7000ms) cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes whyTabProgress {
