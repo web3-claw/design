@@ -69,6 +69,45 @@ describe('cleanup-deprecated', () => {
     it('returns false for non-existent directory', () => {
       assert.equal(isImpeccableSkill(join(tmp, 'nope')), false);
     });
+
+    it('returns true when lock source says pbakaus/impeccable, even if SKILL.md never mentions it', () => {
+      const dir = writeSkill(tmp, '.claude', 'harden', 'A custom skill with no pack mention.');
+      const lock = {
+        skills: { harden: { source: 'pbakaus/impeccable' } },
+      };
+      assert.equal(isImpeccableSkill(dir, { skillName: 'harden', lock }), true);
+    });
+
+    it('returns false when lock source is a different pack', () => {
+      const dir = writeSkill(tmp, '.claude', 'harden', 'A custom skill with no pack mention.');
+      const lock = {
+        skills: { harden: { source: 'someone-else/pack' } },
+      };
+      assert.equal(isImpeccableSkill(dir, { skillName: 'harden', lock }), false);
+    });
+
+    it('falls back to SKILL.md content when no lock entry exists', () => {
+      const dir = writeSkill(tmp, '.claude', 'harden', 'Invoke /impeccable to harden.');
+      const lock = { skills: {} };
+      assert.equal(isImpeccableSkill(dir, { skillName: 'harden', lock }), true);
+    });
+  });
+
+  describe('loadLock', () => {
+    it('returns null when skills-lock.json is missing', () => {
+      assert.equal(loadLock(tmp), null);
+    });
+
+    it('parses skills-lock.json when present', () => {
+      const lock = { version: 1, skills: { arrange: { source: 'pbakaus/impeccable' } } };
+      writeFileSync(join(tmp, 'skills-lock.json'), JSON.stringify(lock), 'utf-8');
+      assert.deepEqual(loadLock(tmp), lock);
+    });
+
+    it('returns null on malformed JSON', () => {
+      writeFileSync(join(tmp, 'skills-lock.json'), '{not json', 'utf-8');
+      assert.equal(loadLock(tmp), null);
+    });
   });
 
   describe('buildTargetNames', () => {
@@ -134,6 +173,74 @@ describe('cleanup-deprecated', () => {
       const deleted = removeDeprecatedSkills(tmp);
       assert.equal(deleted.length, 1); // only arrange
       assert.equal(existsSync(join(tmp, '.claude', 'skills', 'my-custom-skill')), true);
+    });
+
+    it('deletes a stock v2.x harden skill with no lock file via the fingerprint fallback', () => {
+      // Reproduces the no-lock-file install path: user installed via
+      // submodule or manual copy, so skills-lock.json never existed. The
+      // v2.x harden SKILL.md never contained the word "impeccable", but
+      // does contain the distinctive description fingerprint.
+      const body = [
+        '---',
+        'name: harden',
+        'description: "Make interfaces production-ready: error handling, empty states, onboarding flows, i18n, text overflow, and edge case management."',
+        '---',
+        '',
+        'Strengthen interfaces against edge cases.',
+      ].join('\n');
+      writeSkill(tmp, '.claude', 'harden', body);
+      const deleted = removeDeprecatedSkills(tmp);
+      assert.equal(deleted.length, 1);
+      assert.equal(existsSync(join(tmp, '.claude', 'skills', 'harden')), false);
+    });
+
+    it('deletes a stock v2.x optimize skill with no lock file via the fingerprint fallback', () => {
+      const body = [
+        '---',
+        'name: optimize',
+        'description: "Diagnoses and fixes UI performance across loading speed, rendering, animations, images, and bundle size."',
+        '---',
+        '',
+        'Identify and fix performance issues.',
+      ].join('\n');
+      writeSkill(tmp, '.claude', 'optimize', body);
+      const deleted = removeDeprecatedSkills(tmp);
+      assert.equal(deleted.length, 1);
+    });
+
+    it('does NOT delete a user-written harden skill that lacks both the pack word and the fingerprint', () => {
+      writeSkill(tmp, '.claude', 'harden', 'My custom skill for hardening cookies against CSRF.');
+      const deleted = removeDeprecatedSkills(tmp);
+      assert.equal(deleted.length, 0);
+      assert.equal(existsSync(join(tmp, '.claude', 'skills', 'harden')), true);
+    });
+
+    it('deletes skills whose SKILL.md never mentions impeccable when the lock claims them', () => {
+      // Reproduces the "orphan dir" bug: the old SKILL.md bodies described
+      // each skill on its own merits and never said the word "impeccable",
+      // so the content heuristic returned false. The lock source is the
+      // authoritative signal.
+      writeSkill(tmp, '.claude', 'harden', '# Harden\n\nA custom skill with zero pack-name mentions.');
+      const lock = {
+        version: 1,
+        skills: { harden: { source: 'pbakaus/impeccable', sourceType: 'github', computedHash: 'x' } },
+      };
+      writeFileSync(join(tmp, 'skills-lock.json'), JSON.stringify(lock), 'utf-8');
+      const deleted = removeDeprecatedSkills(tmp);
+      assert.equal(deleted.length, 1);
+      assert.equal(existsSync(join(tmp, '.claude', 'skills', 'harden')), false);
+    });
+
+    it('does NOT delete a same-named skill owned by a different pack', () => {
+      writeSkill(tmp, '.claude', 'extract', 'Some user-written extract skill.');
+      const lock = {
+        version: 1,
+        skills: { extract: { source: 'someone-else/pack' } },
+      };
+      writeFileSync(join(tmp, 'skills-lock.json'), JSON.stringify(lock), 'utf-8');
+      const deleted = removeDeprecatedSkills(tmp);
+      assert.equal(deleted.length, 0);
+      assert.equal(existsSync(join(tmp, '.claude', 'skills', 'extract')), true);
     });
 
     it('handles symlinks to deprecated skills', () => {

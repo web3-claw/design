@@ -57,6 +57,17 @@ const HARNESS_DIRS = [
   '.trae', '.trae-cn', '.pi', '.opencode', '.kiro', '.rovodev',
 ];
 
+// Per-skill fingerprints for SKILL.md bodies that never mentioned
+// "impeccable" in their v2.x source. Used as a last-resort match
+// when no skills-lock.json exists and the word heuristic fails.
+// The strings are lifted verbatim from the v2.x frontmatter
+// descriptions, so collisions with hand-written user skills are
+// vanishingly unlikely.
+const SKILL_FINGERPRINTS = {
+  harden: 'Make interfaces production-ready: error handling, empty states',
+  optimize: 'Diagnoses and fixes UI performance across loading speed',
+};
+
 /**
  * Walk up from startDir until we find a directory that looks like a
  * project root (has package.json, .git, or skills-lock.json).
@@ -93,26 +104,32 @@ export function loadLock(projectRoot) {
 }
 
 /**
- * Check whether a skill directory belongs to Impeccable. Prefers the
- * authoritative lock signal (source === "pbakaus/impeccable") when a
- * skillName and lock are supplied, and falls back to a SKILL.md
- * content check for older skills that predate the self-identification
- * convention.
+ * Check whether a skill directory belongs to Impeccable. Three layered
+ * signals, in order of reliability:
+ *   1. Lock source equals "pbakaus/impeccable" (authoritative).
+ *   2. SKILL.md body contains the word "impeccable".
+ *   3. SKILL.md body contains a per-skill fingerprint (for harden and
+ *      optimize, whose v2.x SKILL.md never mentioned the pack name).
  */
 export function isImpeccableSkill(skillDir, { skillName, lock } = {}) {
-  // Authoritative: the lock file claims this skill is ours.
+  // 1. Authoritative: the lock file claims this skill is ours.
   if (skillName && lock?.skills?.[skillName]?.source === 'pbakaus/impeccable') {
     return true;
   }
-  // Fallback: content heuristic for skills without a lock entry.
   const skillMd = join(skillDir, 'SKILL.md');
   if (!existsSync(skillMd)) return false;
+  let content;
   try {
-    const content = readFileSync(skillMd, 'utf-8');
-    return /impeccable/i.test(content);
+    content = readFileSync(skillMd, 'utf-8');
   } catch {
     return false;
   }
+  // 2. Word-level content heuristic.
+  if (/impeccable/i.test(content)) return true;
+  // 3. Per-skill fingerprint for old skills that never mentioned the pack.
+  const fingerprint = skillName && SKILL_FINGERPRINTS[skillName];
+  if (fingerprint && content.includes(fingerprint)) return true;
+  return false;
 }
 
 /**
