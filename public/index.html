@@ -247,71 +247,58 @@
         <p class="section-lead" data-reveal>25 named anti-patterns, detected on your code and in your browser. Before, and what Impeccable steers toward instead.</p>
 
         <div class="antidote-wall" data-reveal>
-          <!-- 01: Purple Gradients → Warm editorial hero -->
-          <a href="/antipattern-examples/purple-gradients.html" class="antidote-pair">
+          <!-- 01: Gradient text → solid italic headline -->
+          <a href="/anti-patterns#gradient-text" class="antidote-pair">
             <figure class="antidote-pair-figure antidote-pair-figure--before">
-              <img src="antipattern-images/purple-gradients.png" alt="Synthwave AI landing page, purple gradient hero" loading="lazy">
+              <div class="ab-slot">
+                <div style="font-family: system-ui, sans-serif;"><div style="font-size: 26px; font-weight: 700; background: linear-gradient(135deg, oklch(65% 0.25 320), oklch(60% 0.25 265)); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.1;">Build the Future</div><div style="font-size: 11px; color: #888; margin-top: 6px;">Gradient text kills scannability.</div></div>
+              </div>
               <figcaption>Before</figcaption>
             </figure>
             <figure class="antidote-pair-figure antidote-pair-figure--after">
-              <div class="ab-after ab-after--editorial" aria-hidden="true">
-                <div class="ab-after-nav">
-                  <span class="ab-after-logo"></span>
-                  <span class="ab-after-link"></span><span class="ab-after-link"></span><span class="ab-after-link"></span>
-                  <span class="ab-after-cta"></span>
-                </div>
-                <div class="ab-after-hero">
-                  <span class="ab-after-kicker">Dispatch · 04</span>
-                  <div class="ab-after-title">Build what <em>actually</em> works.</div>
-                  <div class="ab-after-line"></div>
-                  <div class="ab-after-line ab-after-line--short"></div>
-                  <div class="ab-after-btn">Get started <span aria-hidden="true">→</span></div>
-                </div>
+              <div class="ab-slot">
+                <div style="font-family: var(--font-display); font-weight: 400; font-size: 28px; line-height: 1.02; color: var(--color-ink); letter-spacing: -0.01em;">Build the <em style="font-style: italic; color: var(--color-accent);">future</em>.</div>
+                <div style="font-family: var(--font-body); font-size: 11px; color: var(--color-charcoal); margin-top: 8px;">One weight, one voice, perfect scannability.</div>
               </div>
               <figcaption>After</figcaption>
             </figure>
             <div class="antidote-pair-caption">
               <span class="antidote-pair-num">01</span>
-              <span class="antidote-pair-name">Purple Gradients</span>
+              <span class="antidote-pair-name">Gradient Text</span>
             </div>
           </a>
 
-          <!-- 02: Cardocalypse → Data list, no nesting -->
-          <a href="/antipattern-examples/cardocalypse.html" class="antidote-pair">
+          <!-- 02: Side-tab card → hairline card -->
+          <a href="/anti-patterns#side-tab" class="antidote-pair">
             <figure class="antidote-pair-figure antidote-pair-figure--before">
-              <img src="antipattern-images/cardocalypse.png" alt="Dashboard with cards nested inside cards" loading="lazy">
+              <div class="ab-slot">
+                <div style="background: #fff; border: 1px solid #e8e4df; border-left: 4px solid oklch(60% 0.22 265); border-radius: 6px; padding: 14px 16px; width: 100%; max-width: 240px; font-family: system-ui, sans-serif; font-size: 13px; color: #111;"><div style="font-weight: 600; margin-bottom: 4px;">Alert title</div><div style="color: #666; font-size: 12px;">Thick colored stripe on one side.</div></div>
+              </div>
               <figcaption>Before</figcaption>
             </figure>
             <figure class="antidote-pair-figure antidote-pair-figure--after">
-              <div class="ab-after ab-after--data" aria-hidden="true">
-                <div class="ab-after-data-kicker">This month</div>
-                <div class="ab-after-data-row"><span class="ab-after-data-k">Revenue</span><span class="ab-after-data-v">$2.4M</span><span class="ab-after-data-d">+24.5%</span></div>
-                <div class="ab-after-data-row"><span class="ab-after-data-k">Active users</span><span class="ab-after-data-v">48,219</span><span class="ab-after-data-d">+12.3%</span></div>
-                <div class="ab-after-data-row"><span class="ab-after-data-k">Conversion</span><span class="ab-after-data-v">8.7%</span><span class="ab-after-data-d">+2.1%</span></div>
-                <div class="ab-after-data-row"><span class="ab-after-data-k">NPS</span><span class="ab-after-data-v">72</span><span class="ab-after-data-d">+5 pts</span></div>
+              <div class="ab-slot">
+                <div style="background: var(--color-paper); border: 1px solid var(--color-mist); border-radius: 8px; padding: 14px 16px; width: 100%; max-width: 240px; font-family: var(--font-body); font-size: 13px; color: var(--color-ink);"><div style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--color-accent); margin-bottom: 6px;">Alert</div><div style="font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 16px; line-height: 1.2; color: var(--color-ink); margin-bottom: 3px;">Alert title.</div><div style="color: var(--color-charcoal); font-size: 12px; line-height: 1.45;">Full border, mono kicker, no side stripe.</div></div>
               </div>
               <figcaption>After</figcaption>
             </figure>
             <div class="antidote-pair-caption">
               <span class="antidote-pair-num">02</span>
-              <span class="antidote-pair-name">Cardocalypse</span>
+              <span class="antidote-pair-name">Side-Tab Cards</span>
             </div>
           </a>
 
-          <!-- 03: Hero-Metric Template → Insight-first dashboard hero -->
-          <a href="/antipattern-examples/layout-templates.html" class="antidote-pair">
+          <!-- 03: Hero-metric layout → one honest insight -->
+          <a href="/anti-patterns#hero-metric-layout" class="antidote-pair">
             <figure class="antidote-pair-figure antidote-pair-figure--before">
-              <img src="antipattern-images/layout-templates.png" alt="Hero-metric template layout" loading="lazy">
+              <div class="ab-slot">
+                <div style="font-family: system-ui, sans-serif; text-align: left;"><div style="font-size: 44px; font-weight: 800; background: linear-gradient(135deg, oklch(65% 0.25 265), oklch(65% 0.25 340)); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1;">10M+</div><div style="font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Active users</div><div style="display: flex; gap: 16px; margin-top: 12px; font-size: 10px; color: #555;"><span><strong>99.9%</strong> uptime</span><span><strong>200ms</strong> p50</span></div></div>
+              </div>
               <figcaption>Before</figcaption>
             </figure>
             <figure class="antidote-pair-figure antidote-pair-figure--after">
-              <div class="ab-after ab-after--insight" aria-hidden="true">
-                <div class="ab-after-insight-kicker">This week</div>
-                <div class="ab-after-insight-num">+18.4<span>%</span></div>
-                <div class="ab-after-insight-label">Conversion lift, driven by <em>checkout fixes</em> shipped Tuesday.</div>
-                <svg class="ab-after-spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true">
-                  <polyline points="0,28 18,24 32,26 48,18 62,22 78,14 96,12 112,8 128,10 140,4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
+              <div class="ab-slot">
+                <div style="font-family: var(--font-body);"><div style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-ash); margin-bottom: 6px;">This week</div><div style="font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 46px; line-height: 0.95; color: var(--color-ink); letter-spacing: -0.03em;">+18.4<span style="font-style: normal; font-size: 0.5em; color: var(--color-accent); margin-left: 1px; vertical-align: top;">%</span></div><div style="font-size: 11px; line-height: 1.4; color: var(--color-charcoal); margin-top: 6px; max-width: 22ch;">Conversion lift, from <em style="font-style: italic; color: var(--color-ink);">checkout fixes</em>.</div></div>
               </div>
               <figcaption>After</figcaption>
             </figure>
@@ -1210,5 +1197,8 @@
 
   <script type="module" src="./app.js"></script>
 
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

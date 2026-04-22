@@ -3684,15 +3684,29 @@
 .antidote-pair-figure {
   position: relative;
   margin: 0;
-  aspect-ratio: 4 / 3;
+  min-height: 140px;
   border-radius: 8px;
   background: var(--color-paper);
   border: 1px solid var(--color-mist);
   overflow: hidden;
   transition: box-shadow 260ms var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 18px;
 }
 .antidote-pair-figure--before {
-  filter: saturate(1.05);
+  background: oklch(98% 0 0);
+}
+.antidote-pair-figure--after {
+  background: var(--color-cream);
+}
+.ab-slot {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 }
 .antidote-pair-figure img {
   width: 100%;
@@ -3703,23 +3717,23 @@
 }
 .antidote-pair-figure figcaption {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  right: 8px;
   z-index: 2;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  padding: 3px 8px;
+  padding: 2px 8px;
   border-radius: 3px;
-  background: oklch(100% 0 0 / 0.88);
+  background: oklch(100% 0 0 / 0.9);
   color: var(--color-ink);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-.antidote-pair-figure--before figcaption { color: oklch(35% 0.15 25); }
-.antidote-pair-figure--after figcaption { color: oklch(45% 0.18 145); }
+.antidote-pair-figure--before figcaption { color: oklch(35% 0.15 25); background: oklch(98% 0.04 25 / 0.9); }
+.antidote-pair-figure--after figcaption { color: oklch(45% 0.18 145); background: oklch(96% 0.04 145 / 0.9); }
 .antidote-pair:hover .antidote-pair-figure {
   box-shadow: 0 14px 28px oklch(0% 0 0 / 0.1);
 }
