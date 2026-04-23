@@ -2034,6 +2034,12 @@
   max-width: 60ch;
 }
 
+.designing-phase-sub code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--color-ink);
+}
+
 .designing-phase--appendix .designing-phase-sub {
   font-size: 0.9375rem;
   max-width: 64ch;
@@ -2106,27 +2112,92 @@
   color: var(--color-accent);
 }
 
-/* Codex aside — quieter, pull-quote shape, not a card */
-.designing-codex {
-  margin-top: var(--spacing-xl, 48px);
-  padding: var(--spacing-md, 24px) 0 var(--spacing-md, 24px) var(--spacing-md, 24px);
-  border-left: 2px solid var(--color-accent);
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: var(--spacing-md, 24px);
-  row-gap: 6px;
-  align-items: baseline;
+/* Start-phase flow — two step blocks ("in words", "in pictures")
+   under the single 01 · Start header. Step labels carry the
+   narrative; no competing display headings inside the body. */
+.designing-start {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl, 80px);
 }
 
-@media (max-width: 640px) {
-  .designing-codex {
+.designing-start-step-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 24px);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 var(--spacing-md, 24px) 0;
+}
+
+.designing-start-step-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-mist);
+}
+
+.designing-start-step-note {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+  margin: 0 0 var(--spacing-lg, 32px) 0;
+  max-width: 64ch;
+}
+
+.designing-start-step-note code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-accent);
+}
+
+.designing-visualize-spread {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+@media (max-width: 880px) {
+  .designing-visualize-spread {
     grid-template-columns: 1fr;
   }
 }
 
-.designing-codex-eyebrow {
+.designing-visualize-plate {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 24px);
+}
+
+.designing-visualize-plate-frame {
+  background: var(--color-cream);
+  border: 1px solid var(--color-mist);
+  overflow: hidden;
+}
+
+.designing-visualize-plate-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.designing-visualize-plate-cap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--spacing-md, 24px);
+  align-items: baseline;
+}
+
+.designing-visualize-plate-kind {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -2135,38 +2206,42 @@
   padding-top: 2px;
 }
 
-.designing-codex-body {
+.designing-visualize-plate-note {
   font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--color-ink);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-charcoal);
   margin: 0;
-  max-width: 56ch;
+  max-width: 48ch;
 }
 
-.designing-codex-body code,
-.designing-codex-body strong {
-  font-family: inherit;
-  font-weight: inherit;
-  font-size: inherit;
-  background: transparent;
-  color: inherit;
-  padding: 0;
-}
-
-.designing-codex-hosts {
-  grid-column: 2;
+.designing-visualize-plate-note code {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-ash);
-  margin-top: 8px;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
 }
 
 @media (max-width: 640px) {
-  .designing-codex-hosts {
-    grid-column: 1;
+  .designing-visualize-plate-cap {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
   }
+}
+
+.designing-visualize-foot {
+  margin: var(--spacing-xl, 48px) 0 0 0;
+  padding-top: var(--spacing-md, 24px);
+  border-top: 1px solid var(--color-mist);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--color-ash);
+  max-width: 72ch;
+}
+
+.designing-visualize-foot strong {
+  font-weight: 500;
+  color: var(--color-charcoal);
 }
 
 /* ============================================

@@ -2835,6 +2835,57 @@
   margin-top: -2px;
 }
 
+/* ─ Panel: Visualize, then build — two plates from GPT Image 2 ─ */
+.why-visual--vizfirst {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 0;
+  overflow: visible;
+}
+
+.why-vz-plate {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.why-vz-plate-kind {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.why-vz-plate-frame {
+  background: var(--color-cream);
+  border: 1px solid var(--color-mist);
+  overflow: hidden;
+  height: 240px;
+}
+
+.why-vz-plate-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+@media (max-width: 720px) {
+  .why-visual--vizfirst {
+    gap: 12px;
+  }
+  .why-vz-plate-frame {
+    height: 240px;
+  }
+}
+
 
 /* ============================================
    LANGUAGE section — Palette / Periodic tabs

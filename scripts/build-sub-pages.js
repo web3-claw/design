@@ -975,7 +975,7 @@ function renderDesigningMain() {
     <header class="designing-phase-head">
       <span class="designing-phase-num">01 &middot; Start</span>
       <h2 class="designing-phase-title">From a blank file to a designed feature.</h2>
-      <p class="designing-phase-sub">Run <code>/impeccable teach</code> once per project to establish PRODUCT.md and DESIGN.md. Then reach for <code>/impeccable craft</code> and describe what you want to build. Shape, build, and iterate happen inside one invocation.</p>
+      <p class="designing-phase-sub">Three commands, one arc. <code>/impeccable teach</code> writes the brief, once per project. <code>/impeccable shape</code> drafts a reference you can look at. <code>/impeccable craft</code> codes toward what you can see. Words, then pictures, then code.</p>
       <div class="designing-phase-commands">
         <a class="designing-phase-cmd" href="/docs/teach">/impeccable teach</a>
         <a class="designing-phase-cmd" href="/docs/shape">/impeccable shape</a>
@@ -983,49 +983,48 @@ function renderDesigningMain() {
       </div>
     </header>
 
-    <div class="designing-phase-body">
-      <div class="designing-start-grid">
-        <div class="docs-viz-file" style="margin:0">
-          <div class="docs-viz-file-header">
-            <span class="docs-viz-file-name">PRODUCT.md</span>
-            <span class="docs-viz-file-status">Written by teach</span>
+    <div class="designing-phase-body designing-start">
+      <div class="designing-start-step">
+        <span class="designing-start-step-label">teach &middot; in words</span>
+        <div class="designing-start-grid">
+          <div class="docs-viz-file" style="margin:0">
+            <div class="docs-viz-file-header">
+              <span class="docs-viz-file-name">PRODUCT.md</span>
+              <span class="docs-viz-file-status">Written by teach</span>
+            </div>
+            <div class="docs-viz-file-body">
+              <div class="docs-viz-file-row">
+                <span class="docs-viz-file-k">Register</span>
+                <span class="docs-viz-file-v">Product. Design serves the task.</span>
+              </div>
+              <div class="docs-viz-file-row">
+                <span class="docs-viz-file-k">Users</span>
+                <span class="docs-viz-file-v">SREs on call, reading fast, often in the dark.</span>
+              </div>
+              <div class="docs-viz-file-row">
+                <span class="docs-viz-file-k">Voice</span>
+                <span class="docs-viz-file-v">Calm, clinical, no hype.</span>
+              </div>
+              <div class="docs-viz-file-row">
+                <span class="docs-viz-file-k">Anti-references</span>
+                <span class="docs-viz-file-v">Purple gradients. Glassmorphism. Hype.</span>
+              </div>
+            </div>
           </div>
-          <div class="docs-viz-file-body">
-            <div class="docs-viz-file-row">
-              <span class="docs-viz-file-k">Register</span>
-              <span class="docs-viz-file-v">Product. Design serves the task.</span>
-            </div>
-            <div class="docs-viz-file-row">
-              <span class="docs-viz-file-k">Users</span>
-              <span class="docs-viz-file-v">SREs on call, reading fast, often in the dark.</span>
-            </div>
-            <div class="docs-viz-file-row">
-              <span class="docs-viz-file-k">Voice</span>
-              <span class="docs-viz-file-v">Calm, clinical, no hype.</span>
-            </div>
-            <div class="docs-viz-file-row">
-              <span class="docs-viz-file-k">Anti-references</span>
-              <span class="docs-viz-file-v">Purple gradients. Glassmorphism. Hype.</span>
-            </div>
+          <div class="designing-start-grid-prose">
+            <p>Teach runs a short discovery interview about audience, register, voice, and anti-references. It writes <code>PRODUCT.md</code> and, if there's code to scan, a <code>DESIGN.md</code>. Every later command reads both files before generating.</p>
           </div>
-        </div>
-        <div class="designing-start-grid-prose">
-          <p>Teach runs a short discovery interview about audience, register, voice, and anti-references. It writes <code>PRODUCT.md</code> and, if there's code to scan, a <code>DESIGN.md</code>.</p>
-          <p>From that point on, every command reads both files before generating. Craft, polish, critique, live, all of them.</p>
         </div>
       </div>
 
-      <aside class="designing-visualize" aria-label="Visualize-first workflow with image generation">
-        <header class="designing-visualize-head">
-          <span class="designing-visualize-eyebrow">The new start</span>
-          <h3 class="designing-visualize-title">Shape in pictures. <em>Craft</em> from them.</h3>
-          <p class="designing-visualize-lede">Image generation is finally good enough to serve as a design brief. <code>/impeccable shape</code> drafts a brand toolkit you can review at a glance. <code>/impeccable craft</code> codes toward a hi-fi mock instead of a paragraph. The mood board lives inside the flow, on any harness that can generate images.</p>
-        </header>
+      <div class="designing-start-step">
+        <span class="designing-start-step-label">shape + craft &middot; in pictures</span>
+        <p class="designing-start-step-note">Since image generation crossed the reference-quality threshold, <code>shape</code> drafts a brand toolkit you can review at a glance, and <code>craft</code> codes toward a hi-fi mock instead of a paragraph.</p>
 
         <div class="designing-visualize-spread">
           <figure class="designing-visualize-plate designing-visualize-plate--brand">
             <div class="designing-visualize-plate-frame">
-              <img src="../assets/openai_image_2_brand.jpg" alt="Auto-generated brand toolkit plate: identity lockups, colour palette, type specimens, icon system, and application mocks for a fictional AI design conference, rendered in warm earth tones." loading="lazy" width="1280" height="854" />
+              <img src="../assets/openai_image_2_brand.jpg" alt="Auto-generated brand toolkit plate: identity lockups, colour palette, type specimens, icon system, and application mocks for a fictional AI design conference, rendered in warm earth tones." loading="lazy" width="1536" height="1024" />
             </div>
             <figcaption class="designing-visualize-plate-cap">
               <span class="designing-visualize-plate-kind">Shape</span>
@@ -1035,7 +1034,7 @@ function renderDesigningMain() {
 
           <figure class="designing-visualize-plate designing-visualize-plate--hifi">
             <div class="designing-visualize-plate-frame">
-              <img src="../assets/openai_image_2_hifi.jpg" alt="Auto-generated hi-fi landing-page mock: a long vertical editorial comp for a fictional Tokyo AI design conference, in warm earth tones with committed serif display type." loading="lazy" width="960" height="1280" />
+              <img src="../assets/openai_image_2_hifi.jpg" alt="Auto-generated hi-fi landing-page mock: a long vertical editorial comp for a fictional Tokyo AI design conference, in warm earth tones with committed serif display type." loading="lazy" width="864" height="1821" />
             </div>
             <figcaption class="designing-visualize-plate-cap">
               <span class="designing-visualize-plate-kind">Craft</span>
@@ -1044,8 +1043,8 @@ function renderDesigningMain() {
           </figure>
         </div>
 
-        <p class="designing-visualize-foot">Plates above generated by <strong>OpenAI GPT Image 2</strong> in a single pass. <strong>Gemini Nano Banana Pro</strong>, <strong>Imagen 4 Ultra</strong>, and <strong>Grok Imagen</strong> work the same way, via Codex, Gemini CLI, and compatible harnesses.</p>
-      </aside>
+        <p class="designing-visualize-foot">Plates generated by <strong>OpenAI GPT Image 2</strong>. <strong>Gemini Nano Banana Pro</strong>, <strong>Imagen 4 Ultra</strong>, and <strong>Grok Imagen</strong> work the same way, via Codex, Gemini CLI, and compatible harnesses.</p>
+      </div>
     </div>
   </section>
 
