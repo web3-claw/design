@@ -885,6 +885,82 @@ function resolveGradientStops(el, win) {
   return null;
 }
 
+// Parse a single CSS length token to pixels. Accepts "12px", "50%", a
+// shorthand like "12px 4px" (uses the first value), or empty / null.
+// Returns the pixel value, or null when the input is unparseable.
+// Percentages convert against `widthPx` when one is supplied. Without a
+// usable width (jsdom returns "auto" for many real-world elements,
+// which parseFloat collapses to 0), fall back to the raw percentage
+// number so callers gating on `> 0` (border-accent-on-rounded,
+// isCardLike's hasRadius) still see a positive value, matching the
+// original parseFloat("50%") === 50 behavior.
+function parseRadiusToPx(value, widthPx) {
+  if (!value || typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const first = trimmed.split(/\s+/)[0];
+  const num = parseFloat(first);
+  if (Number.isNaN(num)) return null;
+  if (/%$/.test(first)) {
+    if (widthPx && widthPx > 0) return (num / 100) * widthPx;
+    return num;
+  }
+  return num;
+}
+
+// jsdom from 29.0.2 onward returns "" for the `border-radius` shorthand
+// in computed style and "0" for longhand reads when the source rule used
+// the shorthand. The rule engine relied on parseFloat(style.borderRadius)
+// to identify circular avatars (border-radius >= width/2) and rounded
+// cards (border-radius > 0); both checks broke silently. This helper
+// recovers the radius via a chain of fallbacks. Browsers resolve the
+// shorthand correctly and exit on the first line.
+function resolveBorderRadiusPx(el, style, widthPx, win) {
+  const fromComputed = parseRadiusToPx(style.borderRadius, widthPx);
+  if (fromComputed !== null) return fromComputed;
+
+  if (IS_BROWSER || !win) return 0;
+
+  const fromLonghand = parseRadiusToPx(style.borderTopLeftRadius, widthPx);
+  if (fromLonghand !== null && fromLonghand > 0) return fromLonghand;
+
+  const fromInlineProp = parseRadiusToPx(el.style?.borderRadius, widthPx);
+  if (fromInlineProp !== null) return fromInlineProp;
+
+  const rawStyle = el.getAttribute?.('style') || '';
+  const inlineMatch = rawStyle.match(/border-radius\s*:\s*([^;]+)/i);
+  if (inlineMatch) {
+    const fromRaw = parseRadiusToPx(inlineMatch[1].trim(), widthPx);
+    if (fromRaw !== null) return fromRaw;
+  }
+
+  // Walk every stylesheet looking for matching rules. Take the maximum
+  // pixel value across all matches so a circle declaration overridden by
+  // a more specific rounded-square selector still registers as a circle
+  // for the exclusion check (better to under-flag than to false-positive
+  // on round avatars).
+  let max = 0;
+  const sheets = win.document?.styleSheets;
+  if (sheets) {
+    for (const sheet of sheets) {
+      let rules;
+      try { rules = sheet.cssRules || []; } catch { continue; }
+      for (const rule of rules) {
+        if (!rule.style || !rule.selectorText) continue;
+        let matches = false;
+        try { matches = el.matches(rule.selectorText); } catch { continue; }
+        if (!matches) continue;
+        const ruleValue = rule.style.borderRadius
+          || (rule.style.getPropertyValue && rule.style.getPropertyValue('border-radius'))
+          || rule.style.borderTopLeftRadius;
+        const px = parseRadiusToPx(ruleValue, widthPx);
+        if (px !== null && px > max) max = px;
+      }
+    }
+  }
+  return max;
+}
+
 // ─── Section 5: Element Adapters ────────────────────────────────────────────
 
 // Browser adapters — call getComputedStyle/getBoundingClientRect on live DOM
@@ -1271,7 +1347,7 @@ function checkElementQuality(el, style, tag, window) {
   return checkQuality({ el, tag, style, hasDirectText, textLen, fontSize, lineHeightPx, letterSpacingPx, rect: null });
 }
 
-function checkElementBorders(tag, style, overrides) {
+function checkElementBorders(tag, style, overrides, resolvedRadius) {
   const sides = ['Top', 'Right', 'Bottom', 'Left'];
   const widths = {}, colors = {};
   for (const s of sides) {
@@ -1291,7 +1367,14 @@ function checkElementBorders(tag, style, overrides) {
       colors[s] = overrides[s].color;
     }
   }
-  return checkBorders(tag, widths, colors, parseFloat(style.borderRadius) || 0);
+  // resolvedRadius lets the caller pre-resolve the radius via
+  // resolveBorderRadiusPx so the value survives jsdom 29.1.0's broken
+  // shorthand serialization. Falls back to the computed value for tests
+  // and browser callers that don't pre-resolve.
+  const radius = resolvedRadius != null
+    ? resolvedRadius
+    : (parseFloat(style.borderRadius) || 0);
+  return checkBorders(tag, widths, colors, radius);
 }
 
 function checkElementColors(el, style, tag, window) {
@@ -1346,7 +1429,7 @@ function checkElementIconTile(el, tag, window) {
     siblingBgColor: parseRgb(sibStyle.backgroundColor),
     siblingBgImage: sibStyle.backgroundImage || '',
     siblingBorderWidth: parseFloat(sibStyle.borderTopWidth) || 0,
-    siblingBorderRadius: parseFloat(sibStyle.borderRadius) || 0,
+    siblingBorderRadius: resolveBorderRadiusPx(sibling, sibStyle, sibWidth, window),
     hasIconChild: !!iconChild || hasInlineEmojiIcon,
     iconChildWidth: iconWidth,
   });
@@ -1565,7 +1648,8 @@ function isCardLike(el, win) {
   const hasShadow = (style.boxShadow && style.boxShadow !== 'none') ||
     /\bshadow(?:-sm|-md|-lg|-xl|-2xl)?\b/.test(cls) || /box-shadow/i.test(rawStyle);
   const hasBorder = /\bborder\b/.test(cls);
-  const hasRadius = (parseFloat(style.borderRadius) || 0) > 0 ||
+  const widthPx = parseFloat(style.width) || 0;
+  const hasRadius = resolveBorderRadiusPx(el, style, widthPx, win) > 0 ||
     /\brounded(?:-sm|-md|-lg|-xl|-2xl|-full)?\b/.test(cls) || /border-radius/i.test(rawStyle);
   const hasBg = /\bbg-(?:white|gray-\d+|slate-\d+)\b/.test(cls) ||
     /background(?:-color)?\s*:\s*(?!transparent)/i.test(rawStyle);
