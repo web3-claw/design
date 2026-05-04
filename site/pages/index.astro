@@ -63,6 +63,7 @@ import '../styles/sub-pages.css';
 
 
 
+
       <div class="hero-combined-left">
       <h1 class="hero-title-combined">Impeccable</h1>
       <p class="hero-tagline-combined">Design fluency for AI harnesses</p>
@@ -100,8 +101,9 @@ import '../styles/sub-pages.css';
 
 
       </div>
-      <p class="hero-version-link"><a href="#changelog">v3.0.6: live mode preserves identity, departure mode derives from brand voice</a></p>
+      <p class="hero-version-link"><a href="#changelog">v3.0.7: italic-serif hero and eyebrow-chip detection, recoverable live sessions</a></p>
       </div>
+
 
 
 
@@ -896,7 +898,7 @@ import '../styles/sub-pages.css';
       </div>
 
       <div class="changelog-highlights" data-reveal>
-        <p class="changelog-highlights-label">Highlights since v3.0 <span class="changelog-date">April 10 – 30, 2026</span></p>
+        <p class="changelog-highlights-label">Highlights since v3.0 <span class="changelog-date">April 10 – May 4, 2026</span></p>
         <ul class="changelog-items">
           <li><strong>Live mode preserves identity by default.</strong> Variants stay on-brand for the existing surface and explore different expression axes within that identity. Departure from the current aesthetic only triggers when PRODUCT.md anti-references explicitly reject the current surface, or the user asks for it. Departure directions derive from brand voice, not a fixed catalog.</li>
           <li><strong>Detector flags the new monoculture.</strong> The overused-font rule now catches Fraunces, Geist, Mona Sans, Plus Jakarta Sans, Space Grotesk, Recoleta, and Instrument Sans. Contrast checks run on styled <code>&lt;a&gt;</code> and <code>&lt;button&gt;</code> elements. Brand exceptions for Vercel, Next.js, and GitHub on their own domains.</li>
@@ -910,6 +912,19 @@ import '../styles/sub-pages.css';
         <summary class="changelog-older-toggle">Full version history</summary>
         <div class="changelog-older-entries">
         <div class="changelog-list">
+        <div class="changelog-entry">
+          <div class="changelog-version-header">
+            <span class="changelog-version">v3.0.7</span>
+            <span class="changelog-date">May 4, 2026</span>
+          </div>
+          <ul class="changelog-items">
+            <li><strong>Detector flags italic-serif display heroes.</strong> Oversized italic serif (Fraunces, Recoleta, Newsreader, Playfair, Cormorant, Tiempos) running as the primary hero h1 is now caught as a structural fingerprint of late-2025 and early-2026 AI-generated marketing pages. Editorial and magazine surfaces that legitimately want the pattern can ignore the rule. Contributed by <a href="https://github.com/vinaypokharkar" target="_blank" rel="noopener">@vinaypokharkar</a> in <a href="https://github.com/pbakaus/impeccable/pull/129" target="_blank" rel="noopener">#129</a>.</li>
+            <li><strong>Detector flags hero eyebrow chips.</strong> The uppercase letter-spaced label sitting directly above a hero h1 now fires, including the pill-chip variant (background plus 999px border-radius). Bounded to short labels at small sizes so editorial captions and ordinary subheads do not false-positive. Also contributed by <a href="https://github.com/vinaypokharkar" target="_blank" rel="noopener">@vinaypokharkar</a> in <a href="https://github.com/pbakaus/impeccable/pull/129" target="_blank" rel="noopener">#129</a>.</li>
+            <li><strong>Live mode survives disconnects.</strong> A durable session journal records every event, so an agent crash, a network blip, or a browser refresh no longer loses the session. Three new sub-commands: <code>live status</code> reports current state, <code>live resume</code> rejoins after a break, and <code>live complete</code> finalizes a manually accepted variant. Acknowledgement, polling replies, and fallback recovery all flow through the journal. Contributed by <a href="https://github.com/nqh-packages" target="_blank" rel="noopener">@nqh-packages</a> in <a href="https://github.com/pbakaus/impeccable/pull/125" target="_blank" rel="noopener">#125</a>.</li>
+            <li><strong>Reference files stripped of repetitive scaffolding.</strong> SKILL.md and 33 sub-command files lost the "Remember:" closer chants, the brochure-style "[Verb] [object] to [outcome]" openers on 12 older commands, and 419 em-dashes that obscured the choice between colon, semicolon, period, or parens. Surviving closers hand off to <code>/impeccable polish</code> instead of restating the rules. Less context per command load, less repetition the model has to read past.</li>
+          </ul>
+        </div>
+
         <div class="changelog-entry">
           <div class="changelog-version-header">
             <span class="changelog-version">v3.0.6</span>
